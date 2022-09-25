@@ -14,7 +14,7 @@ php_flag     display_errors         ON
 php_value    error_reporting        ON
 php_flag     short_open_tags        OFF
 php_value    max_input_vars         10000
-#php_value max_execution_time 30
+php_value    max_execution_time     300
 #php_value session.gc_maxlifetime  21600
 
 # use the below for php error logging - log_errors On or Off

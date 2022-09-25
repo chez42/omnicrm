@@ -197,7 +197,7 @@
 								</div>
 							</form>
 							<div class="fgtlink">
-								<a  href="https://ompw.omnisrv.com/pm/" target="_blank" >Forgot password?</a>
+								<a class = "forgotPasswordLink">Forgot password?</a>
 							</div>
 						</div>
 						<div id="forgotPasswordDiv" class="hide">
@@ -367,11 +367,11 @@
 				var loginFormDiv = jQuery('#loginFormDiv');
 				loginFormDiv.find('#password').focus();
 
-				/*loginFormDiv.find('a').click(function () {
+				loginFormDiv.find('a').click(function () {
 					loginFormDiv.toggleClass('hide');
 					forgotPasswordDiv.toggleClass('hide');
 					validationMessage.addClass('hide');
-				});*/
+				});
 
 				forgotPasswordDiv.find('a').click(function () {
 					loginFormDiv.toggleClass('hide');
