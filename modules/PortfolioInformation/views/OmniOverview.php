@@ -43,7 +43,7 @@ class PortfolioInformation_OmniOverview_View extends Vtiger_Index_View{
             if(strlen($request->get('report_end_date')) > 1) {
                 $end_date = date("Y-m-d",strtotime($request->get("report_end_date")));
             }else {
-                $end_date = DetermineIntervalEndDate($accounts, "2020-12-31");//date('Y-m-d'));
+                $end_date = DetermineIntervalEndDate($accounts, "2022-12-31");//date('Y-m-d'));
             }
 
             $t3_performance = new Performance_Model($accounts, DetermineIntervalStartDate($accounts, GetDateMinusMonths(TRAILING_3, $end_date)), $end_date);

@@ -765,10 +765,11 @@ class cSchwabTransactions extends cCustodian
         if($adb->num_rows($result) > 0){
             $query = "UPDATE vtiger_transactions t 
                       JOIN vtiger_transactionscf cf USING(transactionsid)
+					  JOIN vtiger_crmentity on vtiger_crmentity.crmid = t.transactionsid
                       SET t.quantity = ?, t.operation = ?, cf.custodian_control_number = ?, cf.transaction_type = ?, cf.transaction_activity = ?,
                       t.account_number = ?, cf.rep_code = ?, t.security_price = ?, cf.net_amount = ?, key_mnemonic_description = ?,
                       transaction_key_code_description = ?, transaction_code_description = ?
-                      WHERE cloud_transaction_id = ?";
+                      WHERE vtiger_crmentity.deleted = 0  and cloud_transaction_id = ?";
             while($v = $adb->fetchByAssoc($result)){
                 $params = array();
                 $params[] = $v['quantity'];

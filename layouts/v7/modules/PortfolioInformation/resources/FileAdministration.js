@@ -26,7 +26,7 @@ jQuery.Class("FileAdministration_Module_Js",{
 
         $("#PullRecalculate").click(function(e){
             $.post("index.php", {module:'PortfolioInformation', action:'CustodianInteractions', todo:'PullRecalculate', custodian:'ALL'}, function(response) {
-
+		alert(response)
             });
             UpdateStatus('TDUPDATER', '.current-status');
         });

@@ -39,12 +39,12 @@ if (isset($_REQUEST['username']) && isset($_REQUEST['emailId'])) {
 		);
 		$trackURL = Vtiger_ShortURL_Helper::generateURL($options);
 		$content = 'Dear Customer,<br><br> 
-						You recently requested a password reset for your VtigerCRM Open source Account.<br> 
+						You recently requested a password reset for your Omniscient CRM Account.<br> 
 						To create a new password, click on the link <a target="_blank" href='.$trackURL.'>here</a>. 
 						<br><br> 
 						This request was made on '.date("Y-m-d H:i:s").' and will expire in next 24 hours.<br><br> 
 						Regards,<br> 
-						VtigerCRM Open source Support Team.<br>';
+						The OMNI Team.<br>';
 
 		$subject = 'Vtiger CRM: Password Reset';
 

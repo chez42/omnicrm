@@ -257,7 +257,7 @@ class PortfolioInformation_PerformanceReport_View extends Vtiger_Index_View{
 		if(strlen($report_end_date) > 1) {
 			$end_date = date("Y-m-d",strtotime($report_end_date));
 		}else {
-			$end_date = DetermineIntervalEndDate($accounts, "2020-12-31");
+			$end_date = DetermineIntervalEndDate($accounts, "2022-12-31");
 		}
 			
 			
