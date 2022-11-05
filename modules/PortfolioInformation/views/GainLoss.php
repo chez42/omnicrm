@@ -33,7 +33,7 @@ class PortfolioInformation_GainLoss_View extends Vtiger_Index_View{
 
         $calling_module = $request->get('calling_module');
         $calling_record = $request->get('calling_record');
-        if(strlen($request->get("account_number") > 0)){
+        if(strlen($request->get("account_number")) > 0){
             $accounts = explode(",", $request->get("account_number"));
             $accounts = array_unique($accounts);
 
