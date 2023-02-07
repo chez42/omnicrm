@@ -6,7 +6,7 @@ class EODHistoricalData {
     private $exchange;
     private $options = array();
 
-    public function __construct($format='json', $exchange = "US", $apiToken = "59838effd9cac") {
+    public function __construct($format='json', $exchange = "US", $apiToken = "63c9aa8ba1bfa1.20321122") {
         $this->exchange = $exchange;
         $this->options['api_token'] = $apiToken;
         if (isset($format)) {

@@ -176,7 +176,7 @@
                 </tr>
                 <tr>
                     <td colspan="7">MSCI EAFE Index</td>
-                    <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("MSCIEAFE")|number_format:2:".":","}%</td>
+                    <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("MSCI_EAFE")|number_format:2:".":","}%</td>
                 </tr>
 {*                <tr>
                     <td colspan="7" style="font-weight:bold;">Blended Benchmark Return</td>

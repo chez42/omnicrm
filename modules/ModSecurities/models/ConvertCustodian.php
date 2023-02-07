@@ -63,7 +63,7 @@ class ModSecurities_ConvertCustodian_Model extends Vtiger_Module_Model{
 				$exchange = "INDX";
 				break;
 		}
-        $eod = new EODHistoricalData('json', $exchange, '59838effd9cac');
+        $eod = new EODHistoricalData('json', $exchange, '63c9aa8ba1bfa1.20321122');
         return $eod->getHistoricalData($tmp_symbol, $start_date, $end_date);
 
 //		return PortfolioInformation_yql_Model::GetPricingHistory($tmp_symbol, $start_date, $end_date);
@@ -132,7 +132,7 @@ class ModSecurities_ConvertCustodian_Model extends Vtiger_Module_Model{
     static public function UpdateSecurityPriceFromEOD($symbol, $start, $end){
         global $adb;
         
-		$eod = new EODHistoricalData('json', "US", '59838effd9cac');
+		$eod = new EODHistoricalData('json', "US", '63c9aa8ba1bfa1.20321122');
         
 		$result = $eod->getSymbolPricing($symbol, $start, $end);
         

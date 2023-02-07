@@ -40,7 +40,7 @@ class Settings_Vtiger_OutgoingServer_Model extends Settings_Vtiger_Systems_Model
         }else{
             $body = 'Dear '.$currentUser->get('user_name').', <br><br><b> This is a test mail sent to confirm if a mail is
                 actually being sent through the smtp server that you have configured. </b><br>Feel free to delete this mail.
-                <br><br>Thanks  and  Regards,<br> Team Omniscient <br><br>';
+                <br><br>Thanks  and  Regards,<br> Your CRM Team <br><br>';
         }
         
         return $body;
