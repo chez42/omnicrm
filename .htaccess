@@ -19,4 +19,4 @@ php_value    max_execution_time     300
 
 # use the below for php error logging - log_errors On or Off
 php_flag log_errors On
-php_value error_log /var/log/httpd/hq/php-errors
+php_value error_log /var/www/sites/logs/php-errors.log

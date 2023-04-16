@@ -53,3 +53,4 @@ for($i = 0; $i < $adb->num_rows($portfolio_result);  $i++){
 	$accounts[] = $adb->query_result($portfolio_result, $i, "account_number");
 }
 cTDPortfolios::CalculateAndWriteBalances($accounts, $sdate, $edate);
+cTDTransactions::UpdateAllTransactionsOperations([]);

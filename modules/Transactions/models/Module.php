@@ -186,7 +186,9 @@ class Transactions_Module_Model extends Vtiger_Module_Model {
 		
 		$listSearchParams = array();
 		
-		$listSearchParams[0][0] = array('transaction_type', 'e', 'Flow');
+		//Jim modified 'Flow' to 'Trade' - Mar. 7, 2023
+		//$listSearchParams[0][0] = array('transaction_type', 'e', 'Flow');
+		$listSearchParams[0][0] = array('transaction_type', 'e', 'Trade');
 		$listSearchParams[0][1] = array('transaction_activity', 'e', $transaction_activity);
 		$listSearchParams[0][2] = array('trade_date', 'bw', $trade_dates);
 			

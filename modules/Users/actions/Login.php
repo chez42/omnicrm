@@ -14,6 +14,8 @@ require_once 'libraries/Google/autoload.php';
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
 
+require_once 'libraries/2FA/vendor/autoload.php';
+
 class Users_Login_Action extends Vtiger_Action_Controller {
 
 	function loginRequired() {
@@ -46,47 +48,77 @@ class Users_Login_Action extends Vtiger_Action_Controller {
 		$user->column_fields['user_name'] = $username;
 
 		if ($user->doLogin($password)) {
-			session_regenerate_id(true); // to overcome session id reuse.
-
-			$userid = $user->retrieve_user_id($username);
-			Vtiger_Session::set('AUTHUSERID', $userid);
-
-			// For Backward compatability
-			// TODO Remove when switch-to-old look is not needed
-			$_SESSION['authenticated_user_id'] = $userid;
-			$_SESSION['app_unique_key'] = vglobal('application_unique_key');
-			$_SESSION['authenticated_user_language'] = vglobal('default_language');
-
-			//Enabled session variable for KCFINDER 
-			$_SESSION['KCFINDER'] = array(); 
-			$_SESSION['KCFINDER']['disabled'] = false; 
-			$_SESSION['KCFINDER']['uploadURL'] = "test/upload"; 
-			$_SESSION['KCFINDER']['uploadDir'] = "../test/upload";
-			
-			global $root_directory, $site_URL;
-			$_SESSION['CKFINDER']['uploadDir'] = $root_directory;
-			$_SESSION['CKFINDER']['baseUrl'] = $site_URL;
 			
 			
-			$deniedExts = implode(" ", vglobal('upload_badext'));
-			$_SESSION['KCFINDER']['deniedExts'] = $deniedExts;
-			// End
+			$db = PearDatabase::getInstance();
+            
+            // Check if 2 Factor Authentication is On
+            $result = $db->pquery("SELECT secret_key,is_use_two_factor_auth FROM vtiger_users WHERE user_name=?",array($username));
+            
+            $is_use_two_factor_auth = $db->query_result_rowdata($result,0)['is_use_two_factor_auth'];
+            
+            $secretKey = $db->query_result_rowdata($result,0)['secret_key'];
 
-			//Track the login History
-			$moduleModel = Users_Module_Model::getInstance('Users');
-			$moduleModel->saveLoginHistory($user->column_fields['user_name']);
-			//End
-						
-			if(isset($_SESSION['return_params'])){
-				$return_params = $_SESSION['return_params'];
-			}
+            if($is_use_two_factor_auth){
+                
+                if(!$secretKey || $secretKey == '') {
+                    $g = new Sonata\GoogleAuthenticator\GoogleAuthenticator();
+                    $secret = $g->generateSecret();
+                    $qr_image = Sonata\GoogleAuthenticator\GoogleQrUrl::generate($username, $secret, parse_url($site_URL)['host']);
+                    echo json_encode(['status' => 'success', 'is_use_two_factor_auth' => true, 'qr_image' => $qr_image, 'secret' => $secret]);
+                    exit;
+                } else {
+                    echo json_encode(['status' => 'success', 'is_use_two_factor_auth' => true]);
+                }
+                
+            } else {
+			
+				session_regenerate_id(true); // to overcome session id reuse.
 
-			header ('Location: index.php?module=Users&parent=Settings&view=SystemSetup');
-			exit();
+				$userid = $user->retrieve_user_id($username);
+				Vtiger_Session::set('AUTHUSERID', $userid);
+
+				// For Backward compatability
+				// TODO Remove when switch-to-old look is not needed
+				$_SESSION['authenticated_user_id'] = $userid;
+				$_SESSION['app_unique_key'] = vglobal('application_unique_key');
+				$_SESSION['authenticated_user_language'] = vglobal('default_language');
+
+				//Enabled session variable for KCFINDER 
+				$_SESSION['KCFINDER'] = array(); 
+				$_SESSION['KCFINDER']['disabled'] = false; 
+				$_SESSION['KCFINDER']['uploadURL'] = "test/upload"; 
+				$_SESSION['KCFINDER']['uploadDir'] = "../test/upload";
+				
+				global $root_directory, $site_URL;
+				$_SESSION['CKFINDER']['uploadDir'] = $root_directory;
+				$_SESSION['CKFINDER']['baseUrl'] = $site_URL;
+				
+				
+				$deniedExts = implode(" ", vglobal('upload_badext'));
+				$_SESSION['KCFINDER']['deniedExts'] = $deniedExts;
+				// End
+
+				//Track the login History
+				$moduleModel = Users_Module_Model::getInstance('Users');
+				$moduleModel->saveLoginHistory($user->column_fields['user_name']);
+				//End
+							
+				if(isset($_SESSION['return_params'])){
+					$return_params = $_SESSION['return_params'];
+				}
+				
+				echo json_encode(['status' => 'success', 'url' => 'index.php?module=Users&parent=Settings&view=SystemSetup']);
+				
+				//header ('Location: index.php?module=Users&parent=Settings&view=SystemSetup');
+				//exit();
+			}	
 		} else {
-			header ('Location: index.php?module=Users&parent=Settings&view=Login&error=login');
-			exit;
+			echo json_encode(['status' => 'fail', 'url' => 'index.php?module=Users&parent=Settings&view=Login&error=login']);
+			//header ('Location: index.php?module=Users&parent=Settings&view=Login&error=login');
+			//
 		}
+		exit;
 	}
 	
 	public function getOfficeToken($code){

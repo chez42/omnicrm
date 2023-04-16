@@ -19,7 +19,14 @@ class Users_Field_Model extends Vtiger_Field_Model {
 	 */
 	public function isReadOnly() {
 		$currentUserModel = Users_Record_Model::getCurrentUserModel();
-		if(($currentUserModel->isAdminUser() == false && $this->get('uitype') == 98) || ($currentUserModel->isAdminUser() == false && $this->get('uitype') == 28) || $this->get('uitype') == 106 || $this->get('uitype') == 156 || $this->get('uitype') == 115) {
+		if(
+			($currentUserModel->isAdminUser() == false && $this->get('uitype') == 98) || 
+			($currentUserModel->isAdminUser() == false && $this->get('uitype') == 28) || 
+			$this->get('uitype') == 106 || 
+			$this->get('uitype') == 156 || 
+			$this->get('uitype') == 115 ||
+		    ($currentUserModel->isAdminUser() == false && $this->getName() == 'is_use_two_factor_auth')
+		) {
 			return true;
 		}
 	}

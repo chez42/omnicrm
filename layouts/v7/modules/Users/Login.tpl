@@ -181,7 +181,7 @@
 						</div>
 						
 						<div id="loginFormDiv">
-							<form class="login-form" method="POST" action="index.php" >
+							<form class="login-form" >
 								<input type="hidden" name="module" value="Users"/>
 								<input type="hidden" name="action" value="Login"/>
 								<div class="form-group">
@@ -218,6 +218,30 @@
 								<a class="purple forgotPasswordLink">Back</a>
 							</div>
 						</div>
+						
+						
+						<div id="otpFormDiv" class="otp-form-div hide">
+							<form>
+								<input type="hidden" name="module" value="Users"/>
+								<input type="hidden" name="action" value="LoginOtp"/>
+								<input type="hidden" name="secret" value="">
+								
+								<div class="form-group qr_image hide" style = "text-align:center;">
+									<span style = "font-size:14px;">Scan with the Google Authenticator App:</span>
+									<img src="" alt="" id="qr_image">
+								</div>
+								
+								<div class="form-group">
+									<input id="otp-code" class="form-control"  type="text" name="otp_code" placeholder="OTP Code">
+								 </div>
+								<div class="field_group_button">
+									<button type="submit" class="button buttonBlue forgot-submit-btn">Submit</button>
+								</div>
+							</form>
+						</div>
+						
+						
+						
 					</div>
 				</div>
 				<div class="extbuttons">
@@ -366,7 +390,8 @@
 
 				var loginFormDiv = jQuery('#loginFormDiv');
 				loginFormDiv.find('#password').focus();
-
+				var otpFormDiv = jQuery('#otpFormDiv');
+				
 				loginFormDiv.find('a').click(function () {
 					loginFormDiv.toggleClass('hide');
 					forgotPasswordDiv.toggleClass('hide');
@@ -396,6 +421,69 @@
 					}
 					return result;
 				});
+				
+				
+				
+				jQuery('#loginFormDiv form').on('submit', function (e) {
+				    e.preventDefault();
+                    $.ajax({
+                        type: 'POST',
+                        url: "index.php",
+                        data: $(this).serialize(),
+                        success: function(data){
+                            data = JSON.parse(data);
+
+                            if(data.status === 'success'){
+                                $(".failureMessage").hide();
+                                if(data.is_use_two_factor_auth) {
+                                    loginFormDiv.addClass('hide');
+                                    otpFormDiv.removeClass('hide');
+                                }
+
+                                if(data.qr_image) {
+                                    $('.qr_image').removeClass('hide');
+                                    $('#qr_image').attr('src', data.qr_image);
+                                    $('input[name=secret]', otpFormDiv).val(data.secret);
+                                }
+
+                                if(data.url) {
+                                    window.location.href = data.url;
+                                }
+                            }
+                            else {
+                                window.location.href = data.url;
+                            }
+                        }
+                    });
+                });
+				
+				
+				jQuery('#otpFormDiv form').on('submit', function (e) {
+                    e.preventDefault();
+                    $('.failureMessage').addClass('hide').text('');
+                    $.ajax({
+                        type: 'POST',
+                        url: "index.php",
+                        data: $(this).serialize() + '&username=' + $('#username').val() + '&password=' + $('#password').val() + '&secret=' + $('input[name=secret]', otpFormDiv).val(),
+                        success: function(data){
+                            
+                            data = JSON.parse(data);
+                            
+                            if(data.status === 'success'){
+                                window.location.href = data.url;
+                            } else {
+								$(".failureMessage").show();
+                                $('.failureMessage').removeClass('hide').text('Wrong code');
+                                $('#otp-code').val('');
+                            }
+                            
+                        }
+                    });
+                });
+				
+				
+				
+				
 
 				forgotPasswordDiv.find('button').on('click', function () {
 					var username = jQuery('#forgotPasswordDiv #fusername').val();
