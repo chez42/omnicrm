@@ -21,7 +21,7 @@ $languageStrings = array(
 	'LBL_COPY_OTHER_ADDRESS' => 'Copy Other Address',
 	'LBL_COPY_MAILING_ADDRESS' => 'Copy Mailing Address',
     'LBL_PORTAL_CONTROLS' => 'Portal Controls',
-    'Profile Information' => 'Profile',
+    'Profile Information' => 'Investment Profile',
 
 	//Field Labels
 	'Office Phone' => 'Office Phone',

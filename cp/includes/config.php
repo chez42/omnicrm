@@ -13,8 +13,8 @@ if(!$_SESSION['api_url']){
     
      $master_api_url = 'https://hq.360vew.com';
     
-     $master_api_username = 'felipeluna';
-     $master_api_accesskey = 'vW6MiyBQVSfQjt3o';
+     $master_api_username = 'admin';
+     $master_api_accesskey = 'rV8daZto5LQj779';
      
      $master_ws_url =  $master_api_url . '/webservice.php';
      
@@ -78,7 +78,7 @@ else
 if($_SESSION['portal_subtitle'])
     $GLOBALS['portal_subtitle'] = $_SESSION['portal_subtitle'];
 else 
-    $GLOBALS['portal_subtitle'] = 'Empowering our clients to focus on their clients.';
+    $GLOBALS['portal_subtitle'] = 'Empowering our Advisors to focus on their clients.';
     
 if(isset($_SESSION['ID']) && $_SESSION['ID'] != ''){
     

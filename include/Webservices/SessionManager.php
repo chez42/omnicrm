@@ -14,7 +14,7 @@
 	global $maxWebServiceSessionLifeSpan, $maxWebServiceSessionIdleTime;
 	
 	$maxWebServiceSessionLifeSpan = 86400; //Max life span of a session is a day.
-	$maxWebServiceSessionIdleTime = 1800; //Max life span session should be kept alive after the last transaction.
+	$maxWebServiceSessionIdleTime = 2700; //Max life span session should be kept alive after the last transaction.
 	
 	// Till Here.
 	

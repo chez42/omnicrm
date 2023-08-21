@@ -527,9 +527,9 @@ class PortfolioInformation_PerformanceReport_View extends Vtiger_Index_View{
 		global $site_URL;
 		$coverpage = new FormattedContactInfo($adb->query_result($portfolio_result, 0, "portfolioinformationid"));
 		$coverpage->SetTitle("Portfolio Review");
-		$coverpage->SetLogo($site_URL . "layouts/hardcoded_images/lhimage.jpg");
+		$coverpage->SetLogo($site_URL . "layouts/hardcoded_images/StockPerf.jpg");
 		$viewer->assign("COVERPAGE", $coverpage);
-		$viewer->assign("COVER_LOGO", $site_URL . "layouts/hardcoded_images/lhimage.jpg");
+		$viewer->assign("COVER_LOGO", $site_URL . "layouts/hardcoded_images/StockPerf.jpg");
 		
 		$ispdf = $request->get('pdf');
 		

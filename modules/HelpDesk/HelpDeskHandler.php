@@ -362,8 +362,8 @@ function HelpDesk_notifyTicketComment( $entityData ){
         $documentIds = $adb->query_result($comment, 0, 'filename');
         
         $html = '<div style="padding:10px;line-height:1.5;font-family:\'Lucida Grande\',Verdana,Arial,sans-serif;font-size:12px;color:#444444">
-            <div style="color:#b5b5b5">##- Please type your reply above this line -##</div>
-            <p>Your request (<span dir="ticket_no"><strong>'. $entityData->get('ticket_no') .'</strong></span>) has been updated. To add additional comments, reply to this email.<br></p>';
+            <div style="color:#ff0000">##- This is a no-reply mailbox and it is not monitored. -##</div>
+            <p>Your request (<span dir="ticket_no"><strong>'. $entityData->get('ticket_no') .'</strong></span>) has been updated.<br></p>';
         
         for($c=0;$c<$adb->num_rows($comment);$c++){
             $comData = $adb->query_result_rowdata($comment,$c);
@@ -438,7 +438,7 @@ function HelpDesk_notifyTicketComment( $entityData ){
     
     $fromEmail = $HELPDESK_SUPPORT_EMAIL_ID; //getFromEmailAddress();
     
-	$replyTo = "tickets@omnisrv.com";
+	$replyTo = "no-reply@360vew.com";
     
 	$userName = $currentUserModel->getName();
     

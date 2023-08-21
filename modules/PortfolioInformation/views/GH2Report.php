@@ -209,8 +209,8 @@ class PortfolioInformation_GH2Report_View extends Vtiger_Index_View{
 #                $output = $viewer->view('Reports/LighthouseCover.tpl', 'PortfolioInformation', true);
 
 #                $pdf_content = $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/lighthouse.tpl', $moduleName);
-                $pdf_content = $viewer->fetch('layouts/v7/modules/PortfolioInformation/Reports/LighthouseCover.tpl', $moduleName);
-#                $pdf_content = $viewer->fetch('layouts/v7/modules/PortfolioInformation/Reports/CoverPage.tpl', $moduleName);
+#                $pdf_content = $viewer->fetch('layouts/v7/modules/PortfolioInformation/Reports/LighthouseCover.tpl', $moduleName);
+                $pdf_content = $viewer->fetch('layouts/v7/modules/PortfolioInformation/Reports/CoverPage.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/page_break.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/GH2ReportPDF.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/page_break.tpl', $moduleName);

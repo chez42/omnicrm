@@ -14,7 +14,7 @@ class SMSNotifier_Twilio_Provider implements SMSNotifier_ISMSProvider_Model {
 	private $password;
 	private $parameters = array();
 
-	private $SERVICE_URI = 'https://api.twilio.com/2010-04-01/Accounts/{sid}/SMS/Messages';
+	private $SERVICE_URI = 'https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages';
 	private static $REQUIRED_PARAMETERS = array(array('name'=>'AccountSID','label'=>'Account SID','type'=>'text'),
 												array('name'=>'AuthToken','label'=>'Auth Token','type'=>'text'),
 												array('name'=>'From','label'=>'From','type'=>'text'));
