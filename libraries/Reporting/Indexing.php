@@ -41,7 +41,10 @@ function getReferenceReturn($symbol,$startDate,$endDate) {
 
     $intervalDays = $end['to_days'] - $start['to_days'];
 
-    $guess = $end['price'] / $start['price'] - 1;
+/**    $guess = $end['price'] / $start['price'] - 1; */
+	
+	$delta = $end['price'] - $start['price'];
+	$guess = $delta / $start['price'];
 
     if ($intervalDays >= 365)
         $irr = pow((1+$guess),(365/$intervalDays)) - 1;

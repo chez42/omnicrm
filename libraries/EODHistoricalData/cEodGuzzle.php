@@ -24,7 +24,7 @@ DEFINE("URI_EXCHANGES","https://eodhistoricaldata.com/api/exchanges-list");
 class cEodGuzzle{
     public $api_token, $uri_symbol;
     private $guz;
-    public function __construct($exchange = "US", $apiToken = "59838effd9cac"){
+    public function __construct($exchange = "US", $apiToken = "63c9aa8ba1bfa1.20321122"){
         $this->api_token = $apiToken;
         $this->exchange = $exchange;
         $this->uri_symbol =

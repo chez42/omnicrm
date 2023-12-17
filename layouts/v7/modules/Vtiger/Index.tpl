@@ -9,4 +9,4 @@
 {* modules/Vtiger/views/Index.php *}
 
 {* START YOUR IMPLEMENTATION FROM BELOW. Use {debug} for information *}
-<DIV>TEMPLATE: layout/modules/Vtiger/Index.tpl</DIV>
+<DIV>TEMPLATE: layouts/v7/modules/Vtiger/Index.tpl</DIV>

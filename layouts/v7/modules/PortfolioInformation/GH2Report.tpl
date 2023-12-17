@@ -163,21 +163,21 @@
                     <td style="text-align:right; background-color:RGB(245, 245, 245); font-weight:bold;">{$YTDPERFORMANCE->GetTWR()|number_format:2:".":","}%</td>
                 </tr>
                 <tr>
-                    <td colspan="7">S&amp;P 500</td>
+                    <td colspan="7">S&amp;P 500 (GSPC)</td>
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("GSPC")|number_format:2:".":","}%</td>
                 </tr>
                 <tr>
-                    <td colspan="7">Barclays Aggregate Bond</td>
+                    <td colspan="7">Barclays Aggregate Bond (AGG)</td>
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("AGG")|number_format:2:".":","}%</td>
                 </tr>
                 <tr>
-                    <td colspan="7">MSCI Emerging Market index</td>
+                    <td colspan="7">MSCI Emerging Market (EMM)</td>
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("EEM")|number_format:2:".":","}%</td>
                 </tr>
-                <tr>
+{*                <tr>
                     <td colspan="7">MSCI EAFE Index</td>
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("MSCI_EAFE")|number_format:2:".":","}%</td>
-                </tr>
+                </tr>*}
 {*                <tr>
                     <td colspan="7" style="font-weight:bold;">Blended Benchmark Return</td>
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetBenchmark()|number_format:2:".":","}%</td>
