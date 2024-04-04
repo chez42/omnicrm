@@ -13,7 +13,16 @@ jQuery(document).ready(function($) {
         var newWindow = window.open("", "_blank");
 
         $.post("index.php", {module:'PortfolioInformation', action:'GetAccountNumbersFromRecord', record:record}, function(response){
-            var accounts = $.parseJSON(response);
+            var accounts = [];
+            //Get account numbers from selected account_select checkboxes if any
+            if ($('.account_select:checked').length > 0) {
+                $('.account_select:checked').each(function(){
+                    accounts.push($(this).val());
+                });
+//                accounts = JSON.stringify(accounts);
+            } else {
+                accounts = $.parseJSON(response);
+            }
             var url = "index.php?module=PortfolioInformation&view="+report+"&account_number="+accounts+"&calling_record="+record;
 //            window.open("index.php?module=PortfolioInformation&view="+report+"&account_number="+accounts+"&calling_record="+record, "_blank");
             return newWindow.location = url;

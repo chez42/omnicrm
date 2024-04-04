@@ -5,6 +5,7 @@
     <table class="table table-bordered listViewEntriesTable">
     	<thead>
 			<tr class="listViewHeaders">
+				<th>Account Selection</th>
 				<th>Account Number</td>
 				<th style="text-align:left;">Contact Name</th>
 				<th style="text-align:left;">Account Type</th>
@@ -25,6 +26,7 @@
 
 			{foreach from=$SUMMARY_INFO key=k item=i}
 				<tr class="listViewEntries">
+					<td><input type="checkbox" class="account_select" value="{$i.account_number}" /></td>
 					{if not $HIDE_LINKS}
 						<td><a onclick="return false;" class="loadReport" href="#">{$i.account_number} <input type='hidden' class='acct_number' value='{$i.account_number}' /></a></td>
 					{else}

@@ -397,7 +397,7 @@ jQuery.Class("IntervalsDaily_Js",{
 
             document.getElementById("lyr").addEventListener("click", function() {
                 SetButtonColor($(this), 'lightgreen');
-                zoomToDatesCustom("2022-01-01", "2022-12-31");
+                zoomToDatesCustom("2023-01-01", "2023-12-31");
             });
 
             document.getElementById("b1m").addEventListener("click", function() {

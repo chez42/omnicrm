@@ -2750,6 +2750,10 @@ IF @beginningNet IS NULL THEN SET @beginningNet := 0; END IF;
                 $dateReturn['start'] = date("Y-m-d", strtotime("January 1st 2022"));
                 $dateReturn['end'] = date("Y-m-d", strtotime("December 31st 2022"));
                 break;
+	    case "2023":
+                $dateReturn['start'] = date("Y-m-d", strtotime("January 1st 2023"));
+                $dateReturn['end'] = date("Y-m-d", strtotime("December 31st 2023"));
+                break;
 	    case "trailing_12":
                 $dateReturn['start'] = date("Y-m-d", strtotime("today -1 year"));
                 $dateReturn['end'] = date("Y-m-d", strtotime("today"));

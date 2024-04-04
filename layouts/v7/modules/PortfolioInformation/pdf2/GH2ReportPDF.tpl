@@ -132,11 +132,11 @@
                 <td colspan="7" style="">MSCI Emerging Market index</td>
                 <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("EEM")|number_format:2:".":","}%</td>
             </tr>
-            <tr>
+{*            <tr>
                 <td colspan="7" style="background-color:RGB(245,245,245)">MSCI EAFE Index</td>
                 <td style="text-align:right; font-weight:bold; background-color:RGB(245,245,245)">{$YTDPERFORMANCE->GetIndex("MSCIEAFE")|number_format:2:".":","}%</td>
             </tr>
-{*            <tr>
+            <tr>
                 <td colspan="7" style="font-weight:bold;">Blended Benchmark Return</td>
                 <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetBenchmark()|number_format:2:".":","}%</td>
             </tr>*}

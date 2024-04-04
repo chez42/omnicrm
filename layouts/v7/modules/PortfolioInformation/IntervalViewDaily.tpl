@@ -30,7 +30,7 @@
             To: <input type="text" id="tofield" class="amcharts-input" />
         </div>
         <div class="control_buttons">
-            <button id="lyr" class="amcharts-input">2022</button>
+            <button id="lyr" class="amcharts-input">2023</button>
             <button id="b1m" class="amcharts-input">1m</button>
             <button id="b3m" class="amcharts-input">3m</button>
             <button id="b6m" class="amcharts-input">6m</button>
