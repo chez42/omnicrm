@@ -191,6 +191,17 @@ class cIntervals{
                                                || $interval->netReturnAmount < -1.5)
                 $interval->netReturnAmount = 1;
 
+            if($interval->intervalBeginValue == 0 && $interval->investmentReturn > 0) {
+                $interval->netFlowAmount += $interval->investmentReturn;
+                $interval->investmentReturn = 0;
+                $interval->netReturnAmount = 0;
+            }/*
+            if($v['begin_value'] == 0 && $v['end_value'] > 0 && $v['investmentreturn'] > 0) {
+                $intervals[$k]['net_flow'] += $intervals[$k]['investmentreturn'];//begin_value'] = $v['end_value'] - $v['investmentreturn'];
+                $intervals[$k]['investmentreturn'] = 0;
+                $intervals[$k]['net_return_percent'] = 0;
+                $intervals[$k]['twr'] = 0;
+            }*/
 /*            echo $interval->intervalEndDate . ' ---- ' .
                 $interval->intervalEndValue . ' / (' .
                 $interval->intervalBeginValue . ' + (' . $interval->netFlowAmount . ' + ' . $interval->expenseAmount . ')) = ' .
