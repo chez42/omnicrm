@@ -24,13 +24,13 @@ class PortfolioInformation_Detail_View extends Vtiger_Detail_View {
 			$portfolio->get("origination") != 'Millenium' && 
 			$portfolio->get("origination") != 'EQUITY'
 		){
-			$integrity = new cIntegrity($account_number);
+			/*$integrity = new cIntegrity($account_number);
 			$differences = $integrity->GetDifferences();
 
 			foreach($differences AS $k => $v) {
 				if (!empty($differences) && abs($v['dif']) > 10)
 					$integrity->RepairDifferences();
-			}
+			}*/
 			$tmp = new CustodianClassMapping($account_number);
 			$tmp->portfolios::UpdateAllPortfoliosForAccounts($account_number);
 			$tmp->positions::CreateNewPositionsForAccounts($account_number);

@@ -38,13 +38,13 @@ class Accounts_Detail_View extends Vtiger_Detail_View {
 				$adb->query_result($portfolio_result, 0, "origination") != 'EQUITY'
 			){
 				
-				$integrity = new cIntegrity(array($account));
+/*				$integrity = new cIntegrity(array($account));
 				$differences = $integrity->GetDifferences();
 
 				foreach($differences AS $k => $v) {
 					if (!empty($differences) && abs($v['dif']) > 10)
 						$integrity->RepairDifferences();
-				}
+				}*/
 
 				$tmp = new CustodianClassMapping($account);
 				$tmp->portfolios::UpdateAllPortfoliosForAccounts(array($account));
@@ -60,7 +60,7 @@ class Accounts_Detail_View extends Vtiger_Detail_View {
 			}
         
 		}
-    
+
 	}
 
 

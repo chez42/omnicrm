@@ -56,7 +56,7 @@ Vtiger.Class("Vtiger_DashBoard_Js",{
 				var fieldsSelect2 = vtUtils.showSelect2ElementView(fieldsSelectDOM, {
 					placeholder: app.vtranslate('JS_PLEASE_SELECT_ATLEAST_ONE_OPTION'),
 					closeOnSelect: true,
-					maximumSelectionSize: 2
+					maximumSelectionSize: 4
 				});
 				var footer = jQuery('.modal-footer', wizardContainer);
 
