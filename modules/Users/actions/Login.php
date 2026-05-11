@@ -40,6 +40,9 @@ class Users_Login_Action extends Vtiger_Action_Controller {
 		    if($token['success']){
 		         echo $token['url'];
 		         exit;
+		    } else {
+		         echo 'index.php?module=Users&view=Login&error=login';
+		         exit;
 		    }
 		    
 		}
@@ -108,14 +111,14 @@ class Users_Login_Action extends Vtiger_Action_Controller {
 					$return_params = $_SESSION['return_params'];
 				}
 				
-				echo json_encode(['status' => 'success', 'url' => 'index.php?module=Users&parent=Settings&view=SystemSetup']);
+				echo json_encode(['status' => 'success', 'url' => 'index.php']);
 				
-				//header ('Location: index.php?module=Users&parent=Settings&view=SystemSetup');
+				//header ('Location: index.php?module=Users&view=SystemSetup');
 				//exit();
 			}	
 		} else {
-			echo json_encode(['status' => 'fail', 'url' => 'index.php?module=Users&parent=Settings&view=Login&error=login']);
-			//header ('Location: index.php?module=Users&parent=Settings&view=Login&error=login');
+			echo json_encode(['status' => 'fail', 'url' => 'index.php?module=Users&view=Login&error=login']);
+			//header ('Location: index.php?module=Users&view=Login&error=login');
 			//
 		}
 		exit;
@@ -201,16 +204,17 @@ class Users_Login_Action extends Vtiger_Action_Controller {
                     //End
                     
                     if(isset($_SESSION['return_params'])){
-                        $return_params = $_SESSION['return_params'];
+                        $return_params = urldecode($_SESSION['return_params']);
+                        $url = 'index.php?' . $return_params;
+                    } else {
+                        $url = 'index.php';
                     }
-                    
-                    $url = 'index.php?module=Users&parent=Settings&view=SystemSetup';
                 }else {
-                    $url = 'index.php?module=Users&parent=Settings&view=Login&error=login';
+                    $url = 'index.php?module=Users&view=Login&error=login';
                 }
                 
             }catch(Exception $e){
-                $url = 'index.php?module=Users&parent=Settings&view=Login&error=login';
+                $url = 'index.php?module=Users&view=Login&error=login';
             }
 	        
             return array("success" => true, "url" => $url);
@@ -289,16 +293,17 @@ class Users_Login_Action extends Vtiger_Action_Controller {
 	                //End
 	                
 	                if(isset($_SESSION['return_params'])){
-	                    $return_params = $_SESSION['return_params'];
+	                    $return_params = urldecode($_SESSION['return_params']);
+	                    $url = 'index.php?' . $return_params;
+	                } else {
+	                    $url = 'index.php';
 	                }
-	                
-	                $url = 'index.php?module=Users&parent=Settings&view=SystemSetup';
 	            }else {
-	                $url = 'index.php?module=Users&parent=Settings&view=Login&error=login';
+	                $url = 'index.php?module=Users&view=Login&error=login';
 	            }
 	            
 	        }catch(Exception $e){
-	            $url = 'index.php?module=Users&parent=Settings&view=Login&error=login';
+	            $url = 'index.php?module=Users&view=Login&error=login';
 	        }
 	        
 	        return array("success" => true, "url" => $url);
