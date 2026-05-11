@@ -4,3 +4,9 @@
 <IfModule mod_php4.c>
   php_value engine off
 </IfModule>
+
+# Prevent PHP execution in this directory (FPM compatible)
+<FilesMatch "\.(php|phtml|php3|php4|php5|phps)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
