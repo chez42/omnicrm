@@ -91,6 +91,16 @@ jQuery.Class("IntervalsDaily_Js",{
             }
             selected_elements.reverse();
             returns.reverse();
+
+            if (returns.length === 0) {
+                $(".selected_twr").text("0.00%");
+                $(".average_return").text("0.00%");
+                $(".annual_return").text("0.00%");
+                self.selectedCount = 0;
+                self.SetCalculatedText([]);
+                return;
+            }
+
             var r = CalculateReturn(returns);
             average = (r / count).toFixed(2);
             annual = (average * 12).toFixed(2);
@@ -131,6 +141,22 @@ jQuery.Class("IntervalsDaily_Js",{
 
     SetCalculatedText: function(elements){
         var self = this;
+        if (!elements || elements.length === 0) {
+            $(".start_date_range").text("N/A");
+            $(".end_date_range").text("N/A");
+            $(".begin_value").text("$0.00");
+            $(".selected_flows").text("$0.00");
+            $(".selected_income").text("$0.00");
+            $(".selected_expenses").text("$0.00");
+            $(".end_value").text("$0.00");
+            $.each(self.symbolData, function(a, symbol){
+                $(".begin_value_"+symbol.symbol_id).text("N/A");
+                $(".end_value_"+symbol.symbol_id).text("N/A");
+                $(".twr_"+symbol.symbol_id).text("N/A");
+                $(".average_return_"+symbol.symbol_id).text("N/A");
+            });
+            return;
+        }
 //        console.log(elements);
 //        console.log(elements[0].find("td:eq(0)").data('date'));
         var begin_value = parseFloat(elements[0].children('.data_begin_value').data('begin_value'));
@@ -397,7 +423,8 @@ jQuery.Class("IntervalsDaily_Js",{
 
             document.getElementById("lyr").addEventListener("click", function() {
                 SetButtonColor($(this), 'lightgreen');
-                zoomToDatesCustom("2023-01-01", "2023-12-31");
+                var year = $(this).text().trim();
+                zoomToDatesCustom(year + "-01-01", year + "-12-31");
             });
 
             document.getElementById("b1m").addEventListener("click", function() {

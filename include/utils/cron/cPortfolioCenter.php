@@ -34,6 +34,9 @@ class cPortfolioCenter{
     }
     
     public function connect(){
+        if (!function_exists('mssql_connect')) {
+            return 0;
+        }
         $this->dbhandle = mssql_connect($this->server, $this->user, $this->pass);// or die("Couldn't connect to SQL Server on $myServer");
         if(!$this->dbhandle)
             return 0;

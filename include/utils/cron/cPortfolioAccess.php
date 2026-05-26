@@ -18,23 +18,108 @@ class cPortfolioAccess{
      */
     public function CopyBasicPortfolInfoToPortfolioSummaryTable(){
         global $adb;
-        $query = "SELECT p.* FROM vtiger_portfolios p
-                    left outer join vtiger_portfolio_summary vps ON vps.account_number = p.portfolio_account_number
-                    WHERE vps.account_number is null
-                    GROUP BY p.portfolio_id";
-        $result = $adb->pquery($query, array());
-        foreach($result AS $k => $v){
-            $account_number = mysql_real_escape_string($v['portfolio_account_number']);
-            $first_name = mysql_real_escape_string($v['portfolio_first_name']);
-            $last_name = mysql_real_escape_string($v['portfolio_last_name']);
-            $type = mysql_real_escape_string($v['portfolio_account_type']);
-            $advisor_id = $v['advisor_id'];
-            $master = $v['master_account'];
-            $inception = $v['created_date'];
-            $query = "INSERT INTO vtiger_portfolio_summary(account_number, first_name, last_name, account_type, advisor_id, master_account, inception) VALUES
-                      ('{$account_number}', '{$first_name}', '{$last_name}', '{$type}', '{$advisor_id}', '{$master}', '{$inception}')";
-            $adb->pquery($query, array());
-        }
+        $query = "INSERT INTO vtiger_portfolio_summary (account_number, first_name, last_name, account_type, advisor_id, master_account, inception)
+                  SELECT p.portfolio_account_number, p.portfolio_first_name, p.portfolio_last_name, p.portfolio_account_type, p.advisor_id, p.master_account, p.created_date
+                  FROM vtiger_portfolios p
+                  LEFT JOIN vtiger_portfolio_summary vps ON vps.account_number = p.portfolio_account_number
+                  WHERE vps.account_number IS NULL
+                  GROUP BY p.portfolio_id
+                  ON DUPLICATE KEY UPDATE account_number=VALUES(account_number)";
+        $adb->pquery($query, array());
+    }
+
+    /**
+     * Fallback sync to populate vtiger_portfolios from vtiger_portfolioinformation.
+     * Used when the connection to the external PortfolioCenter database is not available.
+     */
+    public function SyncPortfoliosFromPortfolioInformation() {
+        global $adb;
+        echo "Syncing portfolios from vtiger_portfolioinformation to vtiger_portfolios...\n";
+        
+        $query = "INSERT INTO vtiger_portfolios (
+                    portfolio_id, portfolio_portfolio_type_id, portfolio_account_id, portfolio_first_name, portfolio_last_name, portfolio_account_number,
+                    portfolio_inception_date, portfolio_birth_date, portfolio_user_id, portfolio_account_name, portfolio_account_type, portfolio_market_value,
+                    portfolio_cash_value, portfolio_bond_value, portfolio_annual_revenue, portfolio_cost_basis, portfolio_total_value, portfolio_net_new_cash_trans,
+                    portfolio_net_new_cash, portfolio_tax_id, portfolio_service_provider_id, portfolio_client_organization_id, created_date, created_by,
+                    modified_date, modified_by, marked_for_deletion, advisor_fee, advisor_id, master_account, data_set_id, BillingInceptionDate, PerformanceInceptionDate, origination_id, account_closed
+                  ) 
+                  SELECT 
+                    p.portfolioinformationid AS portfolio_id,
+                    16 AS portfolio_portfolio_type_id,
+                    0 AS portfolio_account_id,
+                    p.first_name AS portfolio_first_name,
+                    p.last_name AS portfolio_last_name,
+                    p.account_number AS portfolio_account_number,
+                    COALESCE(p.inceptiondate, '1900-01-01') AS portfolio_inception_date,
+                    NULL AS portfolio_birth_date,
+                    0 AS portfolio_user_id,
+                    CONCAT(COALESCE(p.first_name,''), ' ', COALESCE(p.last_name,'')) AS portfolio_account_name,
+                    p.account_type AS portfolio_account_type,
+                    COALESCE(p.market_value, 0) AS portfolio_market_value,
+                    COALESCE(p.cash_value, 0) AS portfolio_cash_value,
+                    0 AS portfolio_bond_value,
+                    0 AS portfolio_annual_revenue,
+                    0 AS portfolio_cost_basis,
+                    COALESCE(p.total_value, 0) AS portfolio_total_value,
+                    0 AS portfolio_net_new_cash_trans,
+                    0 AS portfolio_net_new_cash,
+                    cf.tax_id AS portfolio_tax_id,
+                    0 AS portfolio_service_provider_id,
+                    0 AS portfolio_client_organization_id,
+                    COALESCE(e.createdtime, NOW()) AS created_date,
+                    1 AS created_by,
+                    COALESCE(e.modifiedtime, NOW()) AS modified_date,
+                    1 AS modified_by,
+                    0 AS marked_for_deletion,
+                    COALESCE(p.annual_management_fee, 0) AS advisor_fee,
+                    p.advisor_id AS advisor_id,
+                    cf.master_account AS master_account,
+                    1 AS data_set_id,
+                    p.inceptiondate AS BillingInceptionDate,
+                    p.inceptiondate AS PerformanceInceptionDate,
+                    1 AS origination_id,
+                    CASE WHEN p.accountclosed = '1' THEN 1 ELSE 0 END AS account_closed
+                  FROM vtiger_portfolioinformation p
+                  JOIN vtiger_crmentity e ON e.crmid = p.portfolioinformationid
+                  LEFT JOIN vtiger_portfolioinformationcf cf ON cf.portfolioinformationid = p.portfolioinformationid
+                  WHERE e.deleted = 0
+                  ON DUPLICATE KEY UPDATE 
+                    portfolio_id = VALUES(portfolio_id),
+                    portfolio_portfolio_type_id = VALUES(portfolio_portfolio_type_id),
+                    portfolio_account_id = VALUES(portfolio_account_id),
+                    portfolio_first_name = VALUES(portfolio_first_name),
+                    portfolio_last_name = VALUES(portfolio_last_name),
+                    portfolio_account_number = VALUES(portfolio_account_number),
+                    portfolio_inception_date = VALUES(portfolio_inception_date),
+                    portfolio_birth_date = VALUES(portfolio_birth_date),
+                    portfolio_account_name = VALUES(portfolio_account_name),
+                    portfolio_account_type = VALUES(portfolio_account_type),
+                    portfolio_market_value = VALUES(portfolio_market_value),
+                    portfolio_cash_value = VALUES(portfolio_cash_value),
+                    portfolio_bond_value = VALUES(portfolio_bond_value),
+                    portfolio_annual_revenue = VALUES(portfolio_annual_revenue),
+                    portfolio_cost_basis = VALUES(portfolio_cost_basis),
+                    portfolio_total_value = VALUES(portfolio_total_value),
+                    portfolio_net_new_cash_trans = VALUES(portfolio_net_new_cash_trans),
+                    portfolio_net_new_cash = VALUES(portfolio_net_new_cash),
+                    portfolio_tax_id = VALUES(portfolio_tax_id),
+                    portfolio_service_provider_id = VALUES(portfolio_service_provider_id),
+                    portfolio_client_organization_id = VALUES(portfolio_client_organization_id),
+                    created_date = VALUES(created_date),
+                    created_by = VALUES(created_by),
+                    modified_date = VALUES(modified_date),
+                    modified_by = VALUES(modified_by),
+                    marked_for_deletion = VALUES(marked_for_deletion),
+                    advisor_fee = VALUES(advisor_fee),
+                    advisor_id = VALUES(advisor_id),
+                    master_account = VALUES(master_account),
+                    data_set_id = VALUES(data_set_id),
+                    BillingInceptionDate = VALUES(BillingInceptionDate),
+                    PerformanceInceptionDate = VALUES(PerformanceInceptionDate),
+                    origination_id = VALUES(origination_id),
+                    account_closed = VALUES(account_closed)";
+        
+        $adb->pquery($query, array());
     }
 
     /**
@@ -64,7 +149,7 @@ class cPortfolioAccess{
      */
     public function GetAllPortfolioIDsFromPC(){
         if(!$this->pc->connect())//Try connecting
-            return "Error Connecting to PC";
+            return false;
         $and = '';
         $query = "SELECT p.PortfolioID 
                   FROM Portfolios p 
@@ -83,7 +168,7 @@ class cPortfolioAccess{
      */
     public function GetAllPortfoliosFromPC($pids='', $date=null){
         if(!$this->pc->connect())//Try connecting
-            return "Error Connecting to PC";
+            return false;
         $and = '';
         if(strlen($date) > 0)
             $and .= " AND p.LastModifiedDate >= '{$date}' ";
@@ -928,7 +1013,7 @@ class cPortfolioAccess{
     public function CloseAccounts(){
         global $adb;
         if(!$this->pc->connect())//Try connecting
-            return "Error Connecting to PC";
+            return false;
 
         $query = "SELECT * FROM Portfolios WHERE DataSetID IN ({$this->datasets}) AND PortfolioTypeID = 16 AND ClosedAccountFlag=1";
         $result = mssql_query($query);
@@ -1004,7 +1089,7 @@ class cPortfolioAccess{
 //            $date = $this->GetLastModifiedDate();
 
         $pc = $this->GetAllPortfoliosFromPC($pids, $date);
-        if($pc)
+        if($pc && is_array($pc))
         {
             $count = 0;
             $reset = 0;
@@ -1104,6 +1189,10 @@ class cPortfolioAccess{
 
             }
             $this->ExecuteQuery($query . $query_extension . $update, "Inserting portfolios into vtiger_portfolios table -- Final insert ");
+        }
+        else
+        {
+            $this->SyncPortfoliosFromPortfolioInformation();
         }
         echo "About to copy from portfolios to portfolio_summary (The basic stuff) " . date('Y-m-d H:i:s') . "<br />\r\n";
         ob_flush();

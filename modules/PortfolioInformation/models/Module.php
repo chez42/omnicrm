@@ -1763,6 +1763,8 @@ class PortfolioInformation_Module_Model extends Vtiger_Module_Model
         $questions = generateQuestionMarks($accounts);
         $query = "SELECT SUM(intervalEndValue) / (SUM(intervalBeginValue) + (SUM(NetFlowAmount) + SUM(expenseamount))) AS netreturnamount, 
                      SUM(investmentreturn) AS investmentreturn, IntervalEndDate,
+                     MIN(IntervalBeginDate) AS intervalbegindate,
+                     MIN(AccountNumber) AS accountnumber,
                      SUM(intervalBeginValue) AS intervalBeginValue, SUM(intervalEndValue) AS intervalEndValue,
                      SUM(NetFlowAmount) AS netflowamount,
                      SUM(expenseamount) AS expenseamount,

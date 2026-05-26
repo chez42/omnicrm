@@ -33,10 +33,36 @@ class PortfolioInformation_GH2Report_View extends Vtiger_Index_View{
         $calling_record = $request->get('calling_record');
         $prepared_for = "";
 
-//        if(strlen($request->get("account_number") > 0) || strlen($calling_module) >= 0){
         if(strlen($request->get("account_number") > 0) || strlen($calling_module) >= 0){
             $accounts = explode(",", $request->get("account_number"));
             $accounts = array_unique($accounts);
+
+            // Check if GSPC index is up to date (max date is within the last 24 hours, or since Friday if today is weekend/Monday)
+            $check_result = $adb->pquery("SELECT MAX(date) as max_date FROM vtiger_prices_index WHERE symbol = 'GSPC'", array());
+            $needs_update = true;
+            if($adb->num_rows($check_result) > 0) {
+                $max_date = $adb->query_result($check_result, 0, 'max_date');
+                if ($max_date) {
+                    $max_time = strtotime($max_date);
+                    $diff_days = (time() - $max_time) / (60 * 60 * 24);
+                    // If max date is within 1 day, or within 4 days if today is weekend/Monday, no update needed
+                    $day_of_week = date('N'); // 1 = Monday, 7 = Sunday
+                    if ($day_of_week == 1 || $day_of_week == 7 || $day_of_week == 6) {
+                        if ($diff_days <= 4) {
+                            $needs_update = false;
+                        }
+                    } else {
+                        if ($diff_days <= 1.5) {
+                            $needs_update = false;
+                        }
+                    }
+                }
+            }
+
+            if ($needs_update) {
+                // Execute the optimized sync-index script
+                exec('php /var/www/sites/opt/scripts/sync-index.php');
+            }
 
             $map = new NameMapper();
             $map->RenamePortfoliosBasedOnLinkedContact($accounts);
