@@ -1030,6 +1030,18 @@ class PortfolioInformation_Module_Model extends Vtiger_Module_Model
                         PortfolioInformation_Module_Model::ResetPortfolioValues($record->get('account_number'));
                         PortfolioInformation_ConvertCustodian_Model::UpdatePortfolioValuesFromPositions($custodian, $record->get('account_number'));
                         break;
+                    case stristr($custodian, "axos"):
+                        if (!$nodata) {
+                            PortfolioInformation_Module_Model::ResetPortfolioValues($record->get('account_number'));
+                            PortfolioInformation_ConvertCustodian_Model::UpdatePortfolioValuesAxos($date, $record->get('account_number'));
+                            $symbols = PositionInformation_Module_Model::GetSymbolsForAccountNumber($record->get('account_number'));
+                            if (sizeof($symbols) > 0) {
+                                cAxosSecurities::UpdateAllSymbolsAtOnce($symbols);
+                            }
+                            cAxosPositions::CreateNewPositionsForAccounts(array($record->get('account_number')));
+                            cAxosPositions::UpdateAllCRMPositionsAtOnceForAccounts(array($record->get('account_number')));
+                        }
+                        break;
                     default:
                         if ($asset_allocation->IsInPC($record->get('account_number')))
                             $asset_allocation->UpdateIndividualAccount($crmid, $record->get('account_number'));
@@ -3381,9 +3393,11 @@ IF @beginningNet IS NULL THEN SET @beginningNet := 0; END IF;
         $params[] = $rep_codes;
         $account_numbers = array();
 
+        $col = (strtolower($custodian) == 'axos') ? 'rep_id' : 'rep_code';
+
         $query = "SELECT account_number 
                   FROM custodian_omniscient.custodian_portfolios_{$custodian} 
-                  WHERE rep_code IN ({$questions})";
+                  WHERE {$col} IN ({$questions})";
         $result = $adb->pquery($query, $params, true);
         if($adb->num_rows($result) > 0)
             while($r = $adb->fetchByAssoc($result)){
@@ -3680,8 +3694,9 @@ IF @beginningNet IS NULL THEN SET @beginningNet := 0; END IF;
         $fidelity = self::GetConsolidatedBalances($account_number, $sdate, $edate, 'fidelity', 'net_worth', 'as_of_date');
         $schwab = self::GetConsolidatedBalances($account_number, $sdate, $edate, 'schwab', 'account_value', 'as_of_date');
         $pershing = self::GetConsolidatedBalances($account_number, $sdate, $edate, 'pershing', 'net_worth', 'date');
+        $axos = self::GetConsolidatedBalances($account_number, $sdate, $edate, 'axos', 'account_value', 'as_of_date');
 
-        $values = array_merge($td, $fidelity, $schwab, $pershing);
+        $values = array_merge($td, $fidelity, $schwab, $pershing, $axos);
 
         $query = "INSERT INTO consolidated_balances (account_number, account_value, as_of_date)
                   VALUES (?, ?, ?)

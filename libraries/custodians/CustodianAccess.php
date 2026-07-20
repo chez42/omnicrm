@@ -12,7 +12,12 @@ DEFINE("SCHWAB", array("portfolio" => "custodian_portfolios_schwab", "balance" =
 DEFINE("SCHWAB_FIELDS", array("balance_as_of_date" => "as_of_date"));
 DEFINE("SCHWAB_BALANCE_FIELDS", array("date" => "as_of_date", "value" => "account_value", "money_market" => "cash_balance", "net_cash" => "net_cash", "calculated" => "as_of_date"));
 
+DEFINE("AXOS", array("portfolio" => "custodian_portfolios_axos", "balance" => "custodian_balances_axos", "positions" => "custodian_positions_axos", "transactions" => "custodian_transactions_axos", "prices" => "custodian_prices_axos", "securities" => "custodian_securities_axos"));
+DEFINE("AXOS_FIELDS", array("balance_as_of_date" => "as_of_date"));
+DEFINE("AXOS_BALANCE_FIELDS", array("date" => "as_of_date", "value" => "account_value", "money_market" => "net_cash", "cash_equivalent" => "net_cash", "available_funds" => "net_cash", "todays_net_change" => "net_cash", "buying_power" => "net_cash", "net_balance" => "net_cash", "option_buying_power" => "net_cash", "calculated" => "insert_date"));
+
 DEFINE("PERSHING", array("portfolio" => "custodian_portfolios_pershing", "balance" => "custodian_balances_pershing", "positions" => "custodian_positions_pershing", "transactions" => "custodian_transactions_pershing", "prices" => "custodian_prices_pershing", "securities" => "custodian_securities_pershing"));
+
 
 DEFINE("INCL", 1);
 DEFINE("EXCL", 0);
@@ -48,6 +53,12 @@ class CustodianAccess{
                 $this->fields = SCHWAB_FIELDS;
                 $this->balance_fields = SCHWAB_BALANCE_FIELDS;
                 $this->positions = cSchwabPositions::GetPositionDataAsOfDate(array($account_number), date("Y-m-d"));
+                break;
+            case "AXOS":
+                $this->custodian = AXOS;
+                $this->fields = AXOS_FIELDS;
+                $this->balance_fields = AXOS_BALANCE_FIELDS;
+                $this->positions = cAxosPositions::GetPositionDataAsOfDate(array($account_number), date("Y-m-d"));
                 break;
             case "PERSHING":
                 $this->custodian = PERSHING;

@@ -15,6 +15,8 @@ cFidelityPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);//Create any mis
 echo date("Y-m-d H:i:s") . ' - portfolios created Fidelity - <br />';
 cSchwabPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);//Create any missing Fidelity portfolios
 echo date("Y-m-d H:i:s") . ' - portfolios created Schwab - <br />';
+cAxosPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);//Create any missing Axos portfolios
+echo date("Y-m-d H:i:s") . ' - portfolios created Axos - <br />';
 #echo 'now check for 678498025';exit;
 
 StatusUpdate::UpdateMessage("CRONUPDATER", "Grabbing Accounts");

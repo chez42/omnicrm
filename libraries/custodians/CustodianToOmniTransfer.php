@@ -3,6 +3,7 @@ DEFINE("TD", "TD");
 DEFINE("FIDELITY", "Fidelity");
 DEFINE("SCHWAB", "Schwab");
 DEFINE("PERSHING", "Pershing");
+DEFINE("AXOS", "Axos");
 
 
 class CustodianToOmniTransfer{
@@ -24,6 +25,9 @@ class CustodianToOmniTransfer{
                     break;
                 case "PERSHING":
                     $this->account_numbers[PERSHING][] = $v;
+                    break;
+                case "AXOS":
+                    $this->account_numbers[AXOS][] = $v;
                     break;
             }
         }
@@ -51,6 +55,9 @@ class CustodianToOmniTransfer{
                     break;
                 case "PERSHING":
                     break;
+                CASE "AXOS":
+                    cAxosPositions::UpdateAllCRMPositionsAtOnceForAccounts($v);
+                    break;
             }
         }
     }
@@ -76,6 +83,10 @@ class CustodianToOmniTransfer{
                     break;
                 case "PERSHING":
                     break;
+                CASE "AXOS":
+                    cAxosPositions::CreateNewPositionsForAccounts($v);
+                    cAxosPositions::UpdateAllCRMPositionsAtOnceForAccounts($v);
+                    break;
             }
         }
     }
@@ -93,6 +104,9 @@ class CustodianToOmniTransfer{
                     cSchwabTransactions::CreateNewTransactionsForAccounts($v);
                     break;
                 case "PERSHING":
+                    break;
+                CASE "AXOS":
+                    cAxosTransactions::CreateNewTransactionsForAccounts($v);
                     break;
             }
         }
@@ -136,6 +150,9 @@ class CustodianToOmniTransfer{
                     cSchwabPortfolios::UpdateAllPortfoliosForAccounts($this->account_numbers[SCHWAB]);
                     break;
                 case "PERSHING":
+                    break;
+                CASE "AXOS":
+                    cAxosPortfolios::UpdateAllPortfoliosForAccounts($this->account_numbers[AXOS]);
                     break;
             }
         }
@@ -185,6 +202,16 @@ class CustodianToOmniTransfer{
 
                     break;
                 case "PERSHING":
+                    break;
+                CASE "AXOS":
+                    $symbols = cAxosPositions::GetSymbolListFromCustodian($v);
+                    if(empty($symbols))
+                        return;
+                    $missing_symbols = ModSecurities_Module_Model::GetMissingSymbolsFromList($symbols);
+                    if(!empty($missing_symbols)) {
+                        cAxosSecurities::CreateNewSecurities($missing_symbols);
+                    }
+                    cAxosSecurities::UpdateAllSymbolsAtOnce($symbols);
                     break;
             }
         }

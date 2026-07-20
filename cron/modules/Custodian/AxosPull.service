@@ -1,0 +1,47 @@
+<?php
+require_once("libraries/custodians/cCustodian.php");
+require_once('modules/ModSecurities/actions/ConvertCustodian.php');
+include_once("include/utils/omniscientCustom.php");
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Starting Portfolios (AXOS)");
+
+$adb = PearDatabase::getInstance();
+$result = $adb->pquery("SELECT DISTINCT rep_id FROM custodian_omniscient.custodian_portfolios_axos", array());
+$rep_codes = array();
+while($r = $adb->fetch_array($result)){
+    if($r['rep_id'] != '') {
+        $rep_codes[] = $r['rep_id'];
+    }
+}
+
+// Create portfolios for known rep codes
+cAxosPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);
+
+// Get all accounts present in staging to perform mapping and ingestion
+$result = $adb->pquery("SELECT DISTINCT account_number FROM custodian_omniscient.custodian_portfolios_axos", array());
+$accounts = array();
+while($r = $adb->fetch_array($result)){
+    $accounts[] = $r['account_number'];
+}
+
+$copy = new CustodianToOmniTransfer($accounts);
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Pulling Custodian Positions/Securities (AXOS)");
+$copy->UpdatePortfolios();
+PortfolioInformation_ConvertCustodian_Model::SetDashless();
+$copy->CreateSecurities();
+$copy->CreatePositions();
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Starting Transactions (AXOS)");
+$copy->CreateTransactions();
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Calculating Portfolio Values (AXOS)");
+PortfolioInformation_ConvertCustodian_Model::WriteBalancesToCloud('axos', $accounts);
+PortfolioInformation_ConvertCustodian_Model::UpdatePortfolioValuesAxos(null, $accounts);
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Consolidating Balances (AXOS)");
+$start = date('Y-m-d', strtotime('-14 days'));
+$finish = date('Y-m-d');
+PortfolioInformation_Module_Model::ConsolidatedBalances($accounts, $start, $finish);
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Axos pull finished");

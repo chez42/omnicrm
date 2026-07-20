@@ -9,8 +9,8 @@ spl_autoload_register(function ($className) {
         include_once "libraries/custodians/Pershing/$className.php";
     }elseif (file_exists("libraries/custodians/Fidelity/$className.php")){
         include_once "libraries/custodians/Fidelity/$className.php";
-    }elseif (file_exists("libraries/custodians/Schwab/$className.php")){
-        include_once "libraries/custodians/Schwab/$className.php";
+    }elseif (file_exists("libraries/custodians/Axos/$className.php")){
+        include_once "libraries/custodians/Axos/$className.php";
     }elseif (file_exists("libraries/custodians/Omniscient/$className.php")){
         include_once "libraries/custodians/Omniscient/$className.php";
     }elseif (file_exists("libraries/custodians/Traits/$className.php")){

@@ -346,6 +346,77 @@ class PortfolioInformation_ConvertCustodian_Model extends Vtiger_Module_Model{
 		$adb->pquery($query, $params);
 	}
 
+	static public function UpdatePortfolioValuesAxos($date = null, $accounts = null){
+		global $adb;
+		$tenant = self::$tenant;
+
+		$params = array();
+		$and = "";
+
+		if($date) {
+			$params[] = $date;
+			$and_date = " AND f.as_of_date = ? ";
+		} else {
+			$and_date = " AND f.as_of_date = (SELECT MAX(as_of_date) FROM {$tenant}.custodian_balances_axos WHERE account_number = p.dashless) ";
+		}
+
+		if($accounts){
+			$questions = generateQuestionMarks($accounts);
+			$params[] = $accounts;
+			$and .= " AND p.account_number IN ({$questions})";
+		}
+		$query = "UPDATE vtiger_portfolioinformation p
+				  JOIN vtiger_portfolioinformationcf cf ON p.portfolioinformationid = cf.portfolioinformationid
+				  JOIN {$tenant}.custodian_balances_axos f ON f.account_number = p.dashless
+				  SET p.total_value = f.account_value, cf.cash = f.net_cash, cf.securities = f.securities_value, p.cash_value = f.net_cash
+				  WHERE 1=1 {$and_date} {$and}";
+		$adb->pquery($query, $params);
+	}
+
+	static public function GetBalancesAxosAndWrite($accounts, $date = null){
+		global $adb, $root_directory;
+		$instance_path = rtrim($root_directory, '/');
+		$tenant = self::$tenant;
+		$account_numbers = RemoveDashes($accounts);
+		$params = array();
+		$and = "";
+		
+		if($date) {
+			$params[] = $date;
+			$and_date = " AND date = ? ";
+		} else {
+			$and_date = " AND date = (SELECT MAX(date) FROM {$tenant}.custodian_positions_axos WHERE account_number = pos.account_number AND filename LIKE ?) ";
+			$params[] = $instance_path . '%';
+		}
+
+		if($account_numbers){
+			$questions = generateQuestionMarks($accounts);
+			$and = " AND account_number IN ({$questions}) ";
+			$params[] = $account_numbers;
+		}
+
+		$and .= " AND filename LIKE ? ";
+		$params[] = $instance_path . '%';
+
+		$query = "DROP TABLE IF EXISTS BalanceTotals";
+		$adb->pquery($query, array());
+
+		$query = "CREATE TEMPORARY TABLE BalanceTotals
+				  SELECT account_number, date AS as_of_date,
+				  SUM(market_value) AS account_value,
+				  SUM(CASE WHEN symbol = 'CASHTCA' THEN market_value ELSE 0 END) AS net_cash,
+				  SUM(CASE WHEN symbol != 'CASHTCA' THEN market_value ELSE 0 END) AS securities_value
+				  FROM {$tenant}.custodian_positions_axos pos
+				  WHERE 1=1 {$and_date} {$and}
+				  GROUP BY account_number";
+		$adb->pquery($query, $params);
+
+		$query = "INSERT INTO {$tenant}.custodian_balances_axos (account_number, account_value, net_cash, securities_value, as_of_date, filename, insert_date)
+				  SELECT account_number, account_value, net_cash, securities_value, as_of_date, 'derived', NOW() FROM BalanceTotals
+				  ON DUPLICATE KEY UPDATE account_value = VALUES(account_value), net_cash = VALUES(net_cash), securities_value = VALUES(securities_value)";
+		$adb->pquery($query, array());
+	}
+
 	static private function GetPortfolioInformation($custodian, $account_number){
 		global $adb;
 		$tenant = self::$tenant;
@@ -525,6 +596,10 @@ class PortfolioInformation_ConvertCustodian_Model extends Vtiger_Module_Model{
 				break;
 			case "schwab":
 				self::GetBalancesSchwabAndWrite($accounts, $date);
+				break;
+			case "axos":
+				self::GetBalancesAxosAndWrite($accounts, $date);
+				break;
 		}
 	}
 
