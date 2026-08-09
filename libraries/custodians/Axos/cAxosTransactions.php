@@ -24,12 +24,14 @@ class cAxosTransactions {
         $query = "SELECT 1 AS ownerid, 
                          COALESCE(map.transaction_type, 'Income') AS transaction_type, 
                          COALESCE(map.transaction_activity, 'Interest') AS transaction_activity, 
-                         t.journal_id AS transaction_id, t.account_number, t.trade_date, t.activity_code, 
+                         t.journal_id AS transaction_id, t.account_number, COALESCE(t.trade_date, t.journal_date) AS trade_date, t.activity_code, 
                          CASE WHEN t.symbol = '' THEN 'SCASH' ELSE t.symbol END AS symbol, 
                          t.amount AS net_amount, t.units AS quantity, t.trade_fee, t.unit_cost, 
-                         t.filename, t.rep_id, t.book_value, t.fed_withholding, t.security_fees
+                         t.filename, t.rep_id, t.book_value, t.fed_withholding, t.security_fees,
+                         COALESCE(NULLIF(map.description, ''), sec.security_name, CONCAT('Axos transaction ', t.activity_code)) AS description
                   FROM custodian_omniscient.custodian_transactions_axos t 
-                  LEFT JOIN vtiger_transaction_type_mapping map ON map.code = t.activity_code
+                  LEFT JOIN custodian_omniscient.axosmapping map ON map.activity_code = t.activity_code
+                  LEFT JOIN vtiger_modsecurities sec ON sec.security_symbol = CASE WHEN t.symbol = '' THEN 'SCASH' ELSE t.symbol END
                   WHERE t.account_number IN ({$account_questions}) {$transaction_ids}  
                   GROUP BY t.journal_id";
                   
@@ -56,7 +58,7 @@ class cAxosTransactions {
                 $query = "INSERT INTO vtiger_transactionscf (transactionsid, custodian, transaction_type, transaction_activity, net_amount, broker_fee, other_fee, description, filename)
                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $adb->pquery($query, array($v['crmid'], 'Axos', $v['transaction_type'], $v['transaction_activity'], $v['net_amount'], $v['trade_fee'],
-                                           $v['security_fees'] + $v['fed_withholding'], 'Axos transaction ' . $v['activity_code'], $v['filename']));
+                                           $v['security_fees'] + $v['fed_withholding'], $v['description'], $v['filename']));
             }
         }
     }

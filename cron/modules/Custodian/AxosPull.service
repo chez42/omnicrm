@@ -1,5 +1,6 @@
 <?php
 require_once("libraries/custodians/cCustodian.php");
+require_once("libraries/custodians/Axos/cAxosReconcile.php");
 require_once('modules/ModSecurities/actions/ConvertCustodian.php');
 include_once("include/utils/omniscientCustom.php");
 
@@ -34,6 +35,8 @@ $copy->CreatePositions();
 
 StatusUpdate::UpdateMessage("CRONUPDATER", "Starting Transactions (AXOS)");
 $copy->CreateTransactions();
+PositionInformation_ConvertCustodian_Model::SetPositionOwnerShip();
+Transactions_Module_Model::AssignOwnerBasedOnAccountNumber();
 
 StatusUpdate::UpdateMessage("CRONUPDATER", "Calculating Portfolio Values (AXOS)");
 PortfolioInformation_ConvertCustodian_Model::WriteBalancesToCloud('axos', $accounts);
@@ -43,5 +46,8 @@ StatusUpdate::UpdateMessage("CRONUPDATER", "Consolidating Balances (AXOS)");
 $start = date('Y-m-d', strtotime('-14 days'));
 $finish = date('Y-m-d');
 PortfolioInformation_Module_Model::ConsolidatedBalances($accounts, $start, $finish);
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Reconciling Positions & Transactions (AXOS)");
+cAxosReconcile::ReconcileAccountsForDateRange($accounts, '2026-07-14', $finish);
 
 StatusUpdate::UpdateMessage("CRONUPDATER", "Axos pull finished");

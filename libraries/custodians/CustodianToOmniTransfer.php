@@ -160,17 +160,19 @@ class CustodianToOmniTransfer{
 
     public function CreateSecurities()
     {
+        $new_symbols = array();
         foreach ($this->account_numbers AS $k => $v) {
             switch (strtoupper($k)) {
                 CASE "TD":
                     $symbols = cTDPositions::GetSymbolListFromCustodian($v);//Get a list of existing positions
 
                     if(empty($symbols))
-                        return;
+                        continue 2;
 
                     $missing_symbols = ModSecurities_Module_Model::GetMissingSymbolsFromList($symbols);//Get list of securities that don't exist in the CRM but do have positions
-                    if(!empty($missing_symbols)) {
+                    if(!empty($missing_symbols) && is_array($missing_symbols)) {
                         cTDSecurities::CreateNewSecurities($missing_symbols);//Create securities in the CRM
+                        $new_symbols = array_merge($new_symbols, $missing_symbols);
                     }
                     cTDSecurities::UpdateAllSymbolsAtOnce($symbols);
                     break;
@@ -179,11 +181,12 @@ class CustodianToOmniTransfer{
                     $symbols = cFidelityPositions::GetSymbolListFromCustodian($v);//Get a list of existing positions
 
                     if(empty($symbols))
-                        return;
+                        continue 2;
 
                     $missing_symbols = ModSecurities_Module_Model::GetMissingSymbolsFromList($symbols);//Get list of securities that don't exist in the CRM but do have positions
-                    if(!empty($missing_symbols)) {
+                    if(!empty($missing_symbols) && is_array($missing_symbols)) {
                         cFidelitySecurities::CreateNewSecurities($missing_symbols);//Create securities in the CRM
+                        $new_symbols = array_merge($new_symbols, $missing_symbols);
                     }
                     cFidelitySecurities::UpdateAllSymbolsAtOnce($symbols);
                     break;
@@ -192,11 +195,12 @@ class CustodianToOmniTransfer{
                     $symbols = cSchwabPositions::GetSymbolListFromCustodian($v);//Get a list of existing positions
 
                     if(empty($symbols))
-                        return;
+                        continue 2;
 
                     $missing_symbols = ModSecurities_Module_Model::GetMissingSymbolsFromList($symbols);//Get list of securities that don't exist in the CRM but do have positions
-                    if(!empty($missing_symbols)) {
+                    if(!empty($missing_symbols) && is_array($missing_symbols)) {
                         cSchwabSecurities::CreateNewSecurities($missing_symbols);//Create securities in the CRM
+                        $new_symbols = array_merge($new_symbols, $missing_symbols);
                     }
                     cSchwabSecurities::UpdateAllSymbolsAtOnce($symbols);
 
@@ -206,13 +210,36 @@ class CustodianToOmniTransfer{
                 CASE "AXOS":
                     $symbols = cAxosPositions::GetSymbolListFromCustodian($v);
                     if(empty($symbols))
-                        return;
+                        continue 2;
                     $missing_symbols = ModSecurities_Module_Model::GetMissingSymbolsFromList($symbols);
-                    if(!empty($missing_symbols)) {
+                    if(!empty($missing_symbols) && is_array($missing_symbols)) {
                         cAxosSecurities::CreateNewSecurities($missing_symbols);
+                        $new_symbols = array_merge($new_symbols, $missing_symbols);
                     }
                     cAxosSecurities::UpdateAllSymbolsAtOnce($symbols);
                     break;
+            }
+        }
+
+        if (!empty($new_symbols)) {
+            require_once("libraries/EODHistoricalData/EODGuzzle.php");
+            $guz = new cEodGuzzle();
+            $start = date("Y-m-d", strtotime("-5 years"));
+            $date = date("Y-m-d");
+            foreach ($new_symbols as $symbol) {
+                if (empty($symbol)) continue;
+                try {
+                    ModSecurities_ConvertCustodian_Model::UpdateSecurityPriceFromEOD($symbol, $start, $date);
+                    $rawData = $guz->getFundamentals($symbol);
+                    if ($rawData) {
+                        $result = json_decode($rawData);
+                        $dividendData = json_decode($guz->getDividends($symbol, "US", $start, $date));
+                        ModSecurities_ConvertCustodian_Model::UpdateFromEODGuzzleResult($result, $dividendData, $symbol);
+                        ModSecurities_ConvertCustodian_Model::WriteRawEODData($symbol, $rawData);
+                    }
+                } catch (Exception $e) {
+                    // Fail silently so it doesn't break the entire cron process
+                }
             }
         }
     }

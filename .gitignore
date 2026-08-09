@@ -4,8 +4,12 @@ logs/**
 user_privileges/**
 storage/**
 cp/files/**
-test/templates_c/v7/**
+test/templates_c/**
+test/upload**
 /.ckfinder
 parent_tabdata.php
 tabdata.php
-
+.user.ini
+manish-testing.txt
+delete.php
+send-portfolio.php

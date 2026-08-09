@@ -40,7 +40,8 @@ class ModSecurities_ConvertCustodian_Model extends Vtiger_Module_Model{
 	 * @return mixed
 	 * Get the history for the given Security.  If symbol is entered as S&P 500, it automatically converts to query Yahoo for ^GSPC.  Note the returned data will return as ^GSPC
 	 */
-	static public function GetIndexHistory($symbol, $start_date, $end_date, $exchange = "INDX"){
+	static public function GetMappedIndexSymbolAndExchange($symbol) {
+		$symbol = html_entity_decode($symbol);
 		switch($symbol){
 			case "S&P 500":
 				$tmp_symbol = "GSPC";
@@ -63,8 +64,13 @@ class ModSecurities_ConvertCustodian_Model extends Vtiger_Module_Model{
 				$exchange = "INDX";
 				break;
 		}
-        $eod = new EODHistoricalData('json', $exchange, '63c9aa8ba1bfa1.20321122');
-        return $eod->getHistoricalData($tmp_symbol, $start_date, $end_date);
+		return array('symbol' => $tmp_symbol, 'exchange' => $exchange);
+	}
+
+	static public function GetIndexHistory($symbol, $start_date, $end_date, $exchange = "INDX"){
+		$mapping = self::GetMappedIndexSymbolAndExchange($symbol);
+        $eod = new EODHistoricalData('json', $mapping['exchange'], '63c9aa8ba1bfa1.20321122');
+        return $eod->getHistoricalData($mapping['symbol'], $start_date, $end_date);
 
 //		return PortfolioInformation_yql_Model::GetPricingHistory($tmp_symbol, $start_date, $end_date);
 	}
@@ -94,10 +100,13 @@ class ModSecurities_ConvertCustodian_Model extends Vtiger_Module_Model{
      * Updates the index price table for the given symbol using Yahoo returned date
      */
     static public function UpdateIndexEOD($symbol, $start_date, $end_date){
+        $mapping = self::GetMappedIndexSymbolAndExchange($symbol);
         $data = json_decode(self::GetIndexHistory($symbol, $start_date, $end_date));
-        foreach ($data AS $k => $v) {
-            ModSecurities_Module_Model::InsertIndexPrice($symbol, $v->date, $v->open, $v->high, $v->low, $v->close, $v->volume, $v->adjusted_close);
-        };
+        if (is_array($data)) {
+            foreach ($data AS $k => $v) {
+                ModSecurities_Module_Model::InsertIndexPrice($mapping['symbol'], $v->date, $v->open, $v->high, $v->low, $v->close, $v->volume, $v->adjusted_close);
+            }
+        }
     }
 
     static public function UpdateIndexOmniscient($symbol, $start_date, $end_date){

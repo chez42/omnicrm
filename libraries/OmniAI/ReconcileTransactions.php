@@ -21,6 +21,9 @@ class ReconcileTransactions{
             case "PERSHING":
                 $this->cashname = "PCASH";
                 break;
+            case "AXOS":
+                $this->cashname = "CASHTCA";
+                break;
         }
 
         self::GenerateReleventTransactions();

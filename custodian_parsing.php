@@ -20,7 +20,7 @@ $parse_query['axos']['pos'][0] = "LOAD DATA LOCAL INFILE ? INTO TABLE tmp
                                     account_number = TRIM(SUBSTRING(@row, 1, 9)),
                                     model          = TRIM(SUBSTRING(@row, 10, 5)),
                                     cusip          = TRIM(SUBSTRING(@row, 15, 10)),
-                                    symbol         = TRIM(SUBSTRING(@row, 25, 10)),
+                                    symbol         = REPLACE(TRIM(SUBSTRING(@row, 25, 10)), ' ', ''),
                                     market_value   = CAST(TRIM(SUBSTRING(@row, 35, 15)) AS DECIMAL(15,2)),
                                     units          = CAST(TRIM(SUBSTRING(@row, 51, 15)) AS DECIMAL(15,4)),
                                     book_value     = CAST(TRIM(SUBSTRING(@row, 67, 15)) AS DECIMAL(15,2)),
@@ -38,17 +38,28 @@ $parse_query['axos']['trn'][0] = "LOAD DATA LOCAL INFILE ? INTO TABLE tmp
                                     account_number = TRIM(SUBSTRING(@row, 1, 9)),
                                     model          = TRIM(SUBSTRING(@row, 10, 5)),
                                     cusip          = TRIM(SUBSTRING(@row, 15, 9)),
-                                    symbol         = TRIM(SUBSTRING(@row, 25, 10)),
+                                    symbol         = REPLACE(TRIM(SUBSTRING(@row, 25, 10)), ' ', ''),
                                     units          = CAST(TRIM(SUBSTRING(@row, 35, 15)) AS DECIMAL(15,4)),
                                     journal_date   = STR_TO_DATE(NULLIF(TRIM(SUBSTRING(@row, 51, 8)), ''), '%m/%d/%y'),
-                                    trade_date     = STR_TO_DATE(NULLIF(TRIM(SUBSTRING(@row, 60, 8)), ''), '%m/%d/%y'),
+                                    trade_date     = COALESCE(STR_TO_DATE(NULLIF(TRIM(SUBSTRING(@row, 60, 8)), ''), '%m/%d/%y'), STR_TO_DATE(NULLIF(TRIM(SUBSTRING(@row, 51, 8)), ''), '%m/%d/%y')),
                                     activity_code  = TRIM(SUBSTRING(@row, 69, 5)),
                                     amount         = CAST(TRIM(SUBSTRING(@row, 74, 15)) AS DECIMAL(15,2)),
                                     book_value     = CAST(TRIM(SUBSTRING(@row, 90, 15)) AS DECIMAL(15,2)),
-                                    unit_cost      = CAST(TRIM(SUBSTRING(@row, 106, 15)) AS DECIMAL(15,2)),
+                                    unit_cost      = CAST(TRIM(SUBSTRING(@row, 106, 15)) AS DECIMAL(15,4)) / 10000.0,
                                     fee_assess     = CAST(TRIM(SUBSTRING(@row, 122, 15)) AS DECIMAL(15,2)),
-                                    journal_id     = CAST(TRIM(SUBSTRING(@row, 138, 10)) AS UNSIGNED),
-                                    offset_journal_id = CAST(TRIM(SUBSTRING(@row, 148, 10)) AS UNSIGNED),
+                                    journal_id     = CONCAT(
+                                                       CASE 
+                                                         WHEN TRIM(SUBSTRING(@row, 138, 10)) REGEXP '^[a-zA-Z]' 
+                                                         THEN CONCAT(ASCII(LOWER(SUBSTRING(TRIM(SUBSTRING(@row, 138, 10)), 1, 1))), SUBSTRING(TRIM(SUBSTRING(@row, 138, 10)), 2)) 
+                                                         ELSE TRIM(SUBSTRING(@row, 138, 10)) 
+                                                       END,
+                                                       CAST(ABS(CAST(TRIM(SUBSTRING(@row, 74, 15)) AS DECIMAL(15,2))) * 100 AS UNSIGNED)
+                                                     ),
+                                    offset_journal_id = CASE 
+                                                          WHEN TRIM(SUBSTRING(@row, 148, 10)) REGEXP '^[a-zA-Z]' 
+                                                          THEN CONCAT(ASCII(LOWER(SUBSTRING(TRIM(SUBSTRING(@row, 148, 10)), 1, 1))), SUBSTRING(TRIM(SUBSTRING(@row, 148, 10)), 2)) 
+                                                          ELSE TRIM(SUBSTRING(@row, 148, 10)) 
+                                                        END,
                                     trade_fee      = CAST(TRIM(SUBSTRING(@row, 158, 9)) AS DECIMAL(15,2)),
                                     fed_withholding = CAST(TRIM(SUBSTRING(@row, 168, 9)) AS DECIMAL(15,2)),
                                     security_fees  = CAST(TRIM(SUBSTRING(@row, 178, 9)) AS DECIMAL(15,2)),
@@ -62,7 +73,7 @@ $parse_query['axos']['trn'][2] = "DELETE FROM tmp WHERE account_number LIKE 'AAS
 $parse_query['axos']['sec'][0] = "LOAD DATA LOCAL INFILE ? INTO TABLE tmp
                                   (@row)
                                   SET 
-                                    symbol       = TRIM(SUBSTRING(@row, 1, 10)),
+                                    symbol       = REPLACE(TRIM(SUBSTRING(@row, 1, 10)), ' ', ''),
                                     cusip        = TRIM(SUBSTRING(@row, 11, 10)),
                                     description  = TRIM(SUBSTRING(@row, 21, 41)),
                                     description2 = TRIM(SUBSTRING(@row, 62, 41)),
@@ -79,7 +90,7 @@ $parse_query['axos']['sec'][2] = "DELETE FROM tmp WHERE symbol LIKE 'AAS%' OR sy
 $parse_query['axos']['pri'][0] = "LOAD DATA LOCAL INFILE ? INTO TABLE tmp
                                   (@row)
                                   SET 
-                                    symbol     = TRIM(SUBSTRING(@row, 1, 10)),
+                                    symbol     = REPLACE(TRIM(SUBSTRING(@row, 1, 10)), ' ', ''),
                                     cusip      = TRIM(SUBSTRING(@row, 11, 10)),
                                     price_date = STR_TO_DATE(NULLIF(TRIM(SUBSTRING(@row, 21, 9)), ''), '%m/%d/%y'),
                                     price      = CAST(TRIM(SUBSTRING(@row, 30, 13)) AS DECIMAL(15,4))";
@@ -111,10 +122,10 @@ $parse_query['axos']['cbu'][0] = "LOAD DATA LOCAL INFILE ? INTO TABLE tmp
                                   (@account_number, @ticker, @cusip, @option_symbol, @underlying_ticker, @underlying_cusip, @security_type, @file_date, @open_date, @units, @cost_basis, @unit_cost, @amortization_adjustment, @long_tax_lot, @opening_activity_type, @premium_for_option, @covered, @wash_sale, @gift_type, @gift_date, @date_of_death, @average_cost_lot)
                                   SET 
                                     account_number = TRIM(@account_number),
-                                    ticker = TRIM(@ticker),
+                                    ticker = REPLACE(TRIM(@ticker), ' ', ''),
                                     cusip = TRIM(@cusip),
-                                    option_symbol = TRIM(@option_symbol),
-                                    underlying_ticker = TRIM(@underlying_ticker),
+                                    option_symbol = REPLACE(TRIM(@option_symbol), ' ', ''),
+                                    underlying_ticker = REPLACE(TRIM(@underlying_ticker), ' ', ''),
                                     underlying_cusip = TRIM(@underlying_cusip),
                                     security_type = TRIM(@security_type),
                                     file_date = STR_TO_DATE(NULLIF(TRIM(@file_date), ''), '%m/%d/%Y'),
@@ -141,10 +152,10 @@ $parse_query['axos']['cbl'][0] = "LOAD DATA LOCAL INFILE ? INTO TABLE tmp
                                   (@account_number, @ticker, @cusip, @option_symbol, @underlying_ticker, @underlying_cusip, @security_type, @file_date, @open_date, @closed_date, @units, @cost_basis, @unit_cost, @amortization, @long_tax_lot, @closing_activity_type, @proceeds, @premium_for_options, @short_term_realized_gain_loss, @long_term_realized_gain_loss, @covered, @wash_sale, @disallowed_loss, @gift_type, @gift_date, @date_of_death, @average_cost_lot, @tax_lot_disposition_methodology)
                                   SET 
                                     account_number = TRIM(@account_number),
-                                    ticker = TRIM(@ticker),
+                                    ticker = REPLACE(TRIM(@ticker), ' ', ''),
                                     cusip = TRIM(@cusip),
-                                    option_symbol = TRIM(@option_symbol),
-                                    underlying_ticker = TRIM(@underlying_ticker),
+                                    option_symbol = REPLACE(TRIM(@option_symbol), ' ', ''),
+                                    underlying_ticker = REPLACE(TRIM(@underlying_ticker), ' ', ''),
                                     underlying_cusip = TRIM(@underlying_cusip),
                                     security_type = TRIM(@security_type),
                                     file_date = STR_TO_DATE(NULLIF(TRIM(@file_date), ''), '%m/%d/%Y'),

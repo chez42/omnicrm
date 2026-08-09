@@ -20,7 +20,7 @@ class cAxosSecurities {
                 $v['crmid'] = $adb->getUniqueID("vtiger_crmentity");
 
                 if($v['aclass'] == NULL || TRIM($v['aclass']) == '')
-                    $v['aclass'] = 'Funds';
+                    $v['aclass'] = self::GetAssetClassFromType($v['security_type']);
 
                 $query = "INSERT INTO vtiger_crmentity (crmid, smcreatorid, smownerid, modifiedby, setype, createdtime, modifiedtime, label)
                           VALUES (?, 1, 1, 1, 'ModSecurities', NOW(), NOW(), ?)";
@@ -61,18 +61,40 @@ class cAxosSecurities {
                       JOIN vtiger_crmentity e ON e.crmid = m.modsecuritiesid
                       SET cf.cusip = ?, m.security_name = ?, m.security_price = ?,
                           cf.security_price_adjustment = ?, 
-                          cf.aclass = CASE WHEN cf.aclass IS NULL OR cf.aclass = '' THEN ? ELSE cf.aclass END,
+                          cf.aclass = CASE 
+                              WHEN cf.aclass IS NULL OR cf.aclass = '' THEN ? 
+                              WHEN cf.aclass = 'Cash' AND m.securitytype IN ('FUND', 'Mutual Fund', 'ETF', 'Common Stock', 'Equity') AND m.security_symbol NOT IN ('CASHTCA', 'SCASH', 'CASH', 'USDOLLAR', '\$CASH') THEN ?
+                              ELSE cf.aclass 
+                          END,
                           m.interest_rate = ?, m.maturity_date = ?, cf.provider = ?, m.last_update = ?,
                           cf.interest_rate = ?,
                           e.modifiedtime = ?, m.source = ? 
                       WHERE m.modsecuritiesid = ?";
             while($v = $adb->fetchByAssoc($result)) {
                 if($v['aclass'] == NULL || TRIM($v['aclass']) == '')
-                    $v['aclass'] = 'Funds';
-                $adb->pquery($query, array($v['cusip'], $v['description'], $v['closing_price'], $v['multiplier'], $v['aclass'], $v['interest_rate'],
+                    $v['aclass'] = self::GetAssetClassFromType($v['security_type']);
+                $adb->pquery($query, array($v['cusip'], $v['description'], $v['closing_price'], $v['multiplier'], $v['aclass'], $v['aclass'], $v['interest_rate'],
                                            $v['maturity_date'], $v['origination'], $v['last_update'], $v['interest_rate'], $v['last_update'],
                                            $v['origination'], $v['modsecuritiesid']));
             }
+        }
+    }
+
+    static public function GetAssetClassFromType($asset_type){
+        switch (trim($asset_type)) {
+            case 'C':
+            case 'CM':
+            case 'RHTA':
+            case 'ETF':
+                return 'Stocks';
+            case 'M':
+                return 'Funds';
+            case 'MM':
+                return 'Cash';
+            case 'WF':
+                return 'Alternatives';
+            default:
+                return 'Funds';
         }
     }
 }

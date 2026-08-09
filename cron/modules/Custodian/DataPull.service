@@ -1,6 +1,7 @@
 <?php
 require_once("libraries/custodians/cCustodian.php");
 require_once('modules/ModSecurities/actions/ConvertCustodian.php');
+require_once('modules/PositionInformation/models/ConvertCustodian.php');
 include_once("include/utils/omniscientCustom.php");
 
 $start = date('Y-m-d', strtotime('-5 days'));
@@ -9,7 +10,7 @@ $finish = date('Y-m-d');
 echo date("Y-m-d H:i:s") . ' - start it all - <br />';
 StatusUpdate::UpdateMessage("CRONUPDATER", "Beginning Portfolio Pull");
 $rep_codes = PortfolioInformation_Module_Model::GetRepCodeListFromUsersTable();
-cTDPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);//Create any missing TD portfolios
+#cTDPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);//Create any missing TD portfolios (TD converted to Schwab 9/1/2023)
 echo date("Y-m-d H:i:s") . ' - portfolios created TD - <br />';
 cFidelityPortfolios::CreateNewPortfoliosForRepCodes($rep_codes);//Create any missing Fidelity portfolios
 echo date("Y-m-d H:i:s") . ' - portfolios created Fidelity - <br />';
@@ -37,6 +38,10 @@ echo date("Y-m-d H:i:s") . ' - Positions Updated - <br />';
 StatusUpdate::UpdateMessage("CRONUPDATER", "Updating Transactions");
 $copy->CreateTransactions();
 echo date("Y-m-d H:i:s") . ' - Transactions Updated - <br />';
+
+StatusUpdate::UpdateMessage("CRONUPDATER", "Syncing Position Ownership");
+PositionInformation_ConvertCustodian_Model::SetPositionOwnerShip();
+Transactions_Module_Model::AssignOwnerBasedOnAccountNumber();
 
 StatusUpdate::UpdateMessage("CRONUPDATER", "Consolidating Balances");
 PortfolioInformation_Module_Model::ConsolidatedBalances($accounts, $start, $finish);

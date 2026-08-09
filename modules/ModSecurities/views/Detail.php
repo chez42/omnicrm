@@ -15,61 +15,88 @@ require_once("libraries/Reporting/ReportCommonFunctions.php");
 class ModSecurities_Detail_View extends Vtiger_Detail_View {
 
     public function preProcess(Vtiger_Request $request) {
-
-		$guz = new cEodGuzzle();
-        
-		$security = ModSecurities_Record_Model::getInstanceById($request->get("record"));
-        
-		if(strlen($security->get("option_root_symbol")) > 0 && trim($security->get("option_root_symbol")) != '') {
+        $security = ModSecurities_Record_Model::getInstanceById($request->get("record"));
+        $notes = "";
+        if(strlen($security->get("option_root_symbol")) > 0 && trim($security->get("option_root_symbol")) != '') {
             $symbol = $security->get("option_root_symbol");
             $notes = "This security is an option.  Showing information from the root symbol";
         } else {
             $symbol = $security->get("security_symbol");
         }
 
-        $eod = json_decode($guz->getSymbolRealTimePricing($symbol));
+        $decoded_symbol = html_entity_decode($symbol);
+        $security_type = $security->get('securitytype');
+
+        $exchange = "US";
+        $apiSymbol = $decoded_symbol;
+        if (strtoupper($security_type) == "INDEX") {
+            $mapping = ModSecurities_ConvertCustodian_Model::GetMappedIndexSymbolAndExchange($decoded_symbol);
+            $apiSymbol = $mapping['symbol'];
+            $exchange = $mapping['exchange'];
+        }
+
+        $guz = new cEodGuzzle($exchange);
+        $eod = json_decode($guz->getSymbolRealTimePricing($apiSymbol, $exchange));
         
 		try {
-            $fund = json_decode($guz->getFundamentals($symbol));
+            $fund = json_decode($guz->getFundamentals($apiSymbol, $exchange));
         } catch(Exception $e){}
 
         $date = date("Y-m-d");
-        
-		$start = GetDateMinusDays(30);
-        
-		$security = ModSecurities_Record_Model::getInstanceById($request->get("record"));
-        
-		ModSecurities_ConvertCustodian_Model::UpdateSecurityPriceFromEOD($symbol, $start, $date);
 
-		$guz = new cEodGuzzle();
+        $fiveYearsAgo = date("Y-m-d", strtotime("-5 years"));
+        $db = PearDatabase::getInstance();
+        if (strtoupper($security_type) == "INDEX") {
+            $countResult = $db->pquery("SELECT COUNT(*) AS count FROM vtiger_prices_index WHERE symbol = ? AND date >= ?", array($apiSymbol, $fiveYearsAgo));
+            $priceCount = $db->query_result($countResult, 0, 'count');
+        } else {
+            $countResult = $db->pquery("SELECT COUNT(*) AS count FROM vtiger_prices WHERE symbol = ? AND date >= ?", array($symbol, $fiveYearsAgo));
+            $priceCount = $db->query_result($countResult, 0, 'count');
+        }
+
+        if ($priceCount < 1000) {
+            $start = $fiveYearsAgo;
+        } else {
+            $start = date("Y-m-d", strtotime("-30 days"));
+        }
+
+        if (strtoupper($security_type) == "INDEX") {
+            ModSecurities_ConvertCustodian_Model::UpdateIndexEOD($symbol, $start, $date);
+        } else {
+            ModSecurities_ConvertCustodian_Model::UpdateSecurityPriceFromEOD($symbol, $start, $date);
+        }
+
+		$guz = new cEodGuzzle($exchange);
 		
-		$rawData = $guz->getFundamentals($symbol);
+		$rawData = $guz->getFundamentals($apiSymbol, $exchange);
 		
 		$result = json_decode($rawData);
 		
-		$dividendData = json_decode($guz->getDividends($symbol, "US", $start, $date));
+		$dividendData = json_decode($guz->getDividends($apiSymbol, $exchange, $start, $date));
 		
 		ModSecurities_ConvertCustodian_Model::UpdateFromEODGuzzleResult($result, $dividendData, $symbol);
 		
 		ModSecurities_ConvertCustodian_Model::WriteRawEODData($symbol, $rawData);
 		
-        $change = $eod->change;
-		
-        $percentage = $change / $eod->close * 100;
+        $change = isset($eod->change) ? $eod->change : 0;
+        $close = (isset($eod->close) && $eod->close != 0) ? $eod->close : 1;
+        $percentage = $change / $close * 100;
 
         date_default_timezone_set('America/Los_Angeles');
-        $eod->last_update = date("F d, Y h:i:s a", $eod->timestamp);
+        if (is_object($eod)) {
+            $eod->last_update = date("F d, Y h:i:s a", $eod->timestamp);
+        }
 
         $viewer = $this->getViewer($request);
 
         $viewer->assign('EOD', $eod);
         $viewer->assign("FUND", $fund);
         $viewer->assign("SECURITY_DATA", $security->getData());
-        $viewer->assign("CHANGE", $eod->change);
+        $viewer->assign("CHANGE", $change);
         $viewer->assign("PERCENTAGE", $percentage);
         $viewer->assign("NOTES", $notes);
         
-		if(strlen($fund->General->LogoURL) > 0)
+		if($fund && isset($fund->General->LogoURL) && strlen($fund->General->LogoURL) > 0)
             $viewer->assign("LOGO", URI_LOGOS . $fund->General->LogoURL);
         
 		$viewer->assign("EXTRA_SCRIPTS", $this->getCustomScripts($request));

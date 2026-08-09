@@ -40,10 +40,11 @@ class cAxosPositions {
         if($adb->num_rows($result) > 0){
             while($v = $adb->fetchByAssoc($result)){
                 $v['crmid'] = $adb->getUniqueID("vtiger_crmentity");
+                $ownerid = PortfolioInformation_Module_Model::GetAccountOwnerFromAccountNumber($v['account_number']);
 
                 $query = "INSERT INTO vtiger_crmentity (crmid, smcreatorid, smownerid, modifiedby, setype, createdtime, modifiedtime, label)
-                          VALUES(?, 1, 1, 1, 'PositionInformation', NOW(), NOW(), ?)";
-                $adb->pquery($query, array($v['crmid'], $v['symbol']), true);
+                          VALUES(?, ?, ?, ?, 'PositionInformation', NOW(), NOW(), ?)";
+                $adb->pquery($query, array($v['crmid'], $ownerid, $ownerid, $ownerid, $v['symbol']), true);
 
                 $query = "INSERT INTO vtiger_positioninformation (positioninformationid, security_symbol, description, account_number)
                           VALUES(?, ?, ?, ?)";
@@ -67,7 +68,12 @@ class cAxosPositions {
                          cbu.cost_basis AS cbu_cost_basis, ms.securitytype, mscf.aclass, pinfo.positioninformationid
                   FROM custodian_omniscient.custodian_positions_axos pos
                   JOIN vtiger_positioninformation pinfo ON pinfo.account_number = pos.account_number AND pinfo.security_symbol = pos.symbol
-                  LEFT JOIN custodian_omniscient.custodian_cbu_axos cbu ON cbu.account_number = pos.account_number AND cbu.ticker = pos.symbol AND cbu.file_date = pos.date AND cbu.filename LIKE ?
+                  LEFT JOIN (
+                      SELECT account_number, ticker, file_date, SUM(cost_basis) AS cost_basis 
+                      FROM custodian_omniscient.custodian_cbu_axos 
+                      WHERE filename LIKE ? 
+                      GROUP BY account_number, ticker, file_date
+                  ) cbu ON cbu.account_number = pos.account_number AND cbu.ticker = pos.symbol AND cbu.file_date = pos.date
                   LEFT JOIN vtiger_modsecurities ms ON ms.security_symbol = pinfo.security_symbol
                   LEFT JOIN vtiger_modsecuritiescf mscf USING (modsecuritiesid)
                   WHERE pos.date = (SELECT MAX(date) FROM custodian_omniscient.custodian_positions_axos WHERE account_number = pos.account_number AND filename LIKE ?)
