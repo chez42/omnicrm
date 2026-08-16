@@ -401,6 +401,33 @@ GMA00000037J7T201594 H2R 3CR000000000000205331+000000000000205331+00000000000612
 		$finishedCompareData = Omniscient_BridgingFunctions_Model::WriteCSVToTable($accountList);
 	}
 
+	static public function AuditAxosPositions($filename){
+		$handle = @fopen($filename, "r");
+		$accounts = array();
+		if($handle) {
+			while($line = fgets($handle)){
+				$acct = trim(substr($line, 0, 9));
+				if(empty($acct) || strpos($acct, 'AAS') === 0) continue;
+				$tmp = new stdClass();
+				$tmp->account_number = $acct;
+				$tmp->sSymbol = trim(substr($line, 24, 10));
+				$tmp->quantity = floatval(trim(substr($line, 50, 15)));
+				$tmp->value = floatval(trim(substr($line, 34, 15)));
+				$tmp->filename = $filename;
+				$accounts[$acct][] = $tmp;
+			}
+			fclose($handle);
+		}
+
+		if(!empty($accounts)) {
+			foreach($accounts AS $k => $v){
+				$accountList[$k] = new stdClass();
+				$accountList[$k]->positionList = $v;
+			}
+			$finishedCompareData = Omniscient_BridgingFunctions_Model::WriteCSVToTable($accountList);
+		}
+	}
+
 	static public function CompareCSVPortfolios($account_number){
 		global $adb;
 		$account_number = str_replace('-', '', $account_number);

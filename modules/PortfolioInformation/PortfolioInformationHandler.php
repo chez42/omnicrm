@@ -64,12 +64,33 @@ class PortfolioInformationHandler extends VTEventHandler{
                         $portfolio_record = PortfolioInformation_Record_Model::getInstanceById($recordId);
                         $account_number = $portfolio_record->get("account_number");
                         $repcode = $portfolio_record->get("production_number");
-                        $custodian = $portfolio_record->get("origination");
+                        $custodian = (string)$portfolio_record->get("origination");
+                        $owner_id = $portfolio_record->get("assigned_user_id");
+
+                        if(in_array(strtoupper(trim($custodian)), array('TD', 'TD AMERITRADE'))) {
+                            $adb->pquery("UPDATE vtiger_portfolioinformation 
+                                          SET accountclosed = '1', closingdate = '2023-09-01', total_value = 0, market_value = 0, cash_value = 0 
+                                          WHERE portfolioinformationid = ?", array($recordId));
+                        }
 
                         if(strlen($repcode) > 0) {
                             require_once("libraries/custodians/cCustodianUpdater.php");
                             $update = new cCustodianUpdater("custodian_omniscient");
                             $update->UpdateTable("custodian_portfolios_{$custodian}", array("rep_code"), array($repcode, $account_number), "account_number = ?");
+                        }
+
+                        if(strlen($account_number) > 0 && !empty($owner_id)) {
+                            $adb->pquery("UPDATE vtiger_crmentity e 
+                                          JOIN vtiger_positioninformation pos ON pos.positioninformationid = e.crmid 
+                                          SET e.smownerid = ? 
+                                          WHERE pos.account_number = ? AND e.deleted = 0", 
+                                          array($owner_id, $account_number));
+
+                            $adb->pquery("UPDATE vtiger_crmentity e 
+                                          JOIN vtiger_transactions t ON t.transactionsid = e.crmid 
+                                          SET e.smownerid = ? 
+                                          WHERE t.account_number = ? AND e.deleted = 0", 
+                                          array($owner_id, $account_number));
                         }
                         break;
                 }

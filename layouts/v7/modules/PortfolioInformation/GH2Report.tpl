@@ -46,6 +46,7 @@
                 <input type="hidden" value="{$CALLING_RECORD}" name="calling_record" />
                 <input type="hidden" value="{$START_DATE}" name="report_start_date" />
                 <input type="hidden" value="{$END_DATE}" name="report_end_date" />
+                <input type="hidden" value="{$SHOW_POSITIONS}" name="show_positions" id="show_positions" />
             </form>
         </div>
     </div>
@@ -186,7 +187,8 @@
             </table>
         </div>
 
-        {*<div class="detailViewInfo row-fluid">
+        {if $SHOW_POSITIONS eq 1}
+        <div class="detailViewInfo row-fluid" style="margin-top: 20px;">
             <div class="contents">
                 <div class="row-fluid">
                     <table class="table table-bordered DynaTable table-collapse">
@@ -195,17 +197,17 @@
                             <th>Symbol</th>
                             <th>Cusip</th>
                             <th>Description</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Weight</th>
-                            <th>Value</th>
+                            <th style="text-align:right;">Quantity</th>
+                            <th style="text-align:right;">Price</th>
+                            <th style="text-align:right;">Weight</th>
+                            <th style="text-align:right;">Value</th>
                         </tr>
                         </thead>
                         <tbody>
                         {foreach from=$HOLDINGSPIEARRAY key=k item=heading}
-                            <tr>
+                            <tr style="background-color: #e5e5e5; font-weight: bold;">
                                 <td colspan="5">{$heading['title']}</td>
-                                <td style="text-align:right;">{$heading['percentage']}%</td>
+                                <td style="text-align:right;">{$heading['percentage']|number_format:2:".":","}%</td>
                                 <td style="text-align:right;">${$heading['value']|number_format:2:".":","}</td>
                             </tr>
                             {foreach from=$POSITIONS key=pk item=pv}
@@ -214,9 +216,9 @@
                                         <td>{$pv['symbol']}</td>
                                         <td>{$pv['cusip']}</td>
                                         <td>{$pv['security_name']}</td>
-                                        <td style="text-align:right;">{$pv['quantity']}</td>
-                                        <td style="text-align:right;">${$pv['price']}</td>
-                                        <td style="text-align:right;">{$pv['weight']}%</td>
+                                        <td style="text-align:right;">{$pv['quantity']|number_format:2:".":","}</td>
+                                        <td style="text-align:right;">${$pv['price']|number_format:2:".":","}</td>
+                                        <td style="text-align:right;">{$pv['weight']|number_format:2:".":","}%</td>
                                         <td style="text-align:right;">${$pv['market_value']|number_format:2:".":","}</td>
                                     </tr>
                                 {/if}
@@ -226,6 +228,7 @@
                     </table>
                 </div>
             </div>
-        </div>*}
+        </div>
+        {/if}
     </div>
 </div>

@@ -223,7 +223,8 @@ class cTDPortfolios extends cCustodian {
 
         $query = "UPDATE vtiger_portfolioinformation p 
                   JOIN vtiger_portfolioinformationcf cf USING (portfolioinformationid)
-                  SET origination=?, account_type=?, first_name=?, last_name=?, total_value=?, money_market_funds=?,
+                  SET origination='TD', account_type=?, first_name=?, last_name=?, total_value=0, money_market_funds=0,
+                      accountclosed='1', closingdate='2023-09-01',
                       production_number=?, address1=?, address2=?, address3=?, address4=?, address5=?, address6=?, city=?, 
                       state=?, zip=?, stated_value_date=? WHERE account_number = ?";
         $adb->pquery($query, $params, true);

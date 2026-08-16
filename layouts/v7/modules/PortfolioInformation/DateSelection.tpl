@@ -8,6 +8,13 @@
                 <td>
                     <input type="button" id="calculate_report" value="Calculate" style="display:block; margin-left:5px; font-size:15px;" />
                 </td>
+                {if $SHOW_POSITIONS_TOGGLE eq 1}
+                <td>
+                    <label style="display:inline-block; margin-left: 10px; font-weight: normal; margin-bottom: 0px; cursor: pointer;">
+                        <input type="checkbox" id="show_positions" {if $SHOW_POSITIONS eq 1}checked{/if} style="margin-top: -3px;" /> Show Positions
+                    </label>
+                </td>
+                {/if}
             </tr>
         </table>
     </div>
@@ -35,6 +42,13 @@
                 <td>
                     <input type="button" id="calculate_report" value="Calculate" style="display:block; margin-left:5px; font-size:15px;" />
                 </td>
+                {if $SHOW_POSITIONS_TOGGLE eq 1}
+                <td>
+                    <label style="display:inline-block; margin-left: 10px; font-weight: normal; margin-bottom: 0px; cursor: pointer;">
+                        <input type="checkbox" id="show_positions" {if $SHOW_POSITIONS eq 1}checked{/if} style="margin-top: -3px;" /> Show Positions
+                    </label>
+                </td>
+                {/if}
             </tr>
         </table>
     </div>

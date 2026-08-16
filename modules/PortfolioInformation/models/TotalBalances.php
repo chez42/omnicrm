@@ -170,18 +170,29 @@ class PortfolioInformation_TotalBalances_Model extends Vtiger_Module{
         foreach($ids AS $k => $v){
             try {
                 StatusUpdate::UpdateMessage("TDUPDATER", "Updating user id {$v}");
+                $user_record = Users_Record_Model::getInstanceById($v, 'Users');
+                $is_admin = ($user_record && $user_record->get('is_admin') === 'on');
+
                 $account_numbers = PortfolioInformation_Module_Model::GetAccountNumbersForSpecificUser($v, false);
-                if(count($account_numbers) > 0) {
-                    $questions = generateQuestionMarks($account_numbers);
+                if($is_admin || count($account_numbers) > 0) {
                     $query = "DELETE FROM vtiger_asset_class_totals_users WHERE user_id = ?";
                     $adb->pquery($query, array($v));
 
-                    $query = "SELECT {$v} AS user_id, SUM(value) AS value, CASE WHEN base_asset_class IS NULL OR base_asset_class = '' THEN 'Other' ELSE base_asset_class END AS base_asset_class 
-                              FROM vtiger_asset_class_totals ach
-                              WHERE account_number IN ({$questions})  
-                              AND value != 0
-                              GROUP BY base_asset_class";
-                    $result = $adb->pquery($query, array($account_numbers));
+                    if($is_admin) {
+                        $query = "SELECT {$v} AS user_id, SUM(value) AS value, CASE WHEN base_asset_class IS NULL OR base_asset_class = '' THEN 'Other' ELSE base_asset_class END AS base_asset_class 
+                                  FROM vtiger_asset_class_totals ach
+                                  WHERE value != 0
+                                  GROUP BY base_asset_class";
+                        $result = $adb->pquery($query, array());
+                    } else {
+                        $questions = generateQuestionMarks($account_numbers);
+                        $query = "SELECT {$v} AS user_id, SUM(value) AS value, CASE WHEN base_asset_class IS NULL OR base_asset_class = '' THEN 'Other' ELSE base_asset_class END AS base_asset_class 
+                                  FROM vtiger_asset_class_totals ach
+                                  WHERE account_number IN ({$questions})  
+                                  AND value != 0
+                                  GROUP BY base_asset_class";
+                        $result = $adb->pquery($query, array($account_numbers));
+                    }
                     if($adb->num_rows($result) > 0){
                         $query = "INSERT INTO vtiger_asset_class_totals_users VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE value=VALUES(value)";
                         while($c = $adb->fetchByAssoc($result)){

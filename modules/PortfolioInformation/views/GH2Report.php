@@ -151,7 +151,17 @@ class PortfolioInformation_GH2Report_View extends Vtiger_Index_View{
             $viewer->assign("HOLDINGSSECTORPIESTRING", json_encode($sector_pie));
             $viewer->assign("HOLDINGSSECTORPIEARRAY", $sector_pie);
             $viewer->assign("HOLDINGSPIEARRAY", $new_pie);
-//            $viewer->assign("POSITIONS", $positions);
+            $show_positions = $request->get('show_positions');
+            $viewer->assign("SHOW_POSITIONS", $show_positions);
+            if ($show_positions == 1) {
+                $positions = PortfolioInformation_Reports_Model::GetPositionsFromValuesTable();
+                if (is_array($positions) && $global_total > 0) {
+                    foreach ($positions as $key => $pos) {
+                        $positions[$key]['weight'] = ($pos['market_value'] / $global_total) * 100;
+                    }
+                }
+                $viewer->assign("POSITIONS", $positions);
+            }
             $viewer->assign("GLOBALTOTAL", $global_total);
             $viewer->assign("UNSETTLED_CASH", $unsettled_cash);
             $viewer->assign("MARGIN_BALANCE", $margin_balance);
@@ -166,6 +176,7 @@ class PortfolioInformation_GH2Report_View extends Vtiger_Index_View{
             $viewer->assign("SHOW_END_DATE", 1);
             $viewer->assign("START_DATE", $start_date);
             $viewer->assign("END_DATE", $end_date);
+            $viewer->assign("SHOW_POSITIONS_TOGGLE", 1);
 
             if($calling_record) {
                 $prepared_for = PortfolioInformation_Module_Model::GetPreparedForNameByRecordID($calling_record);
@@ -239,6 +250,10 @@ class PortfolioInformation_GH2Report_View extends Vtiger_Index_View{
                 $pdf_content = $viewer->fetch('layouts/v7/modules/PortfolioInformation/Reports/CoverPage.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/page_break.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/GH2ReportPDF.tpl', $moduleName);
+                if ($show_positions == 1) {
+                    $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/page_break.tpl', $moduleName);
+                    $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/PositionsPDF.tpl', $moduleName);
+                }
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/page_break.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/AllocationTypesPDF.tpl', $moduleName);
                 $pdf_content .= $viewer->fetch('layouts/v7/modules/PortfolioInformation/pdf/page_break.tpl', $moduleName);

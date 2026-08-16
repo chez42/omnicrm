@@ -72,10 +72,19 @@ jQuery.Class("DateSelection",{
 
         $("#calculate_report").click(function(e){
             e.stopImmediatePropagation();
-            edate = $("#select_end_date").val();
-            sdate = $("#select_start_date").val();
+            var edate = $("#select_end_date").val();
+            var sdate = $("#select_start_date").val();
             var loc = window.location.href;
+            loc = loc.replace(/&report_start_date=[^&]*/g, "");
+            loc = loc.replace(/&report_end_date=[^&]*/g, "");
             loc += "&report_start_date=" + sdate + "&report_end_date=" + edate;
+            
+            var show_pos_el = $("#show_positions");
+            if (show_pos_el.length > 0) {
+                var show_pos = show_pos_el.is(":checked") ? 1 : 0;
+                loc = loc.replace(/&show_positions=[^&]*/g, "");
+                loc += "&show_positions=" + show_pos;
+            }
             window.location.href = loc;
         });
     }
