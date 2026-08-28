@@ -207,7 +207,6 @@ class Settings_Vtiger_Module_Model extends Vtiger_Base_Model {
 																 'Calendar Settings'=> '',
 																 'LBL_MY_TAGS'		=> $myTagSettingsUrl,
 		                                                          'Ms Exchange Settings' => '',
-                                                                 'Index Settings' => '',
                                                                  'Statement Settings' => 'index.php?module=PortfolioInformation&view=Statements'),
 									'LBL_EXTENSIONS'	=> array('LBL_GOOGLE'		=> 'index.php?module=Contacts&parent=Settings&view=Extension&extensionModule=Google&extensionView=Index&mode=settings')
 								);

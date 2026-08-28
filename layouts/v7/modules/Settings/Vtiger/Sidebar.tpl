@@ -53,6 +53,8 @@
 											{assign var=MENU_URL value=$USER_MODEL->getCalendarSettingsDetailViewUrl()}
 										{elseif $MENU eq 'Ms Exchange Settings'}  
 											{assign var=MENU_URL value=$USER_MODEL->getMsSettingsDetailViewUrl()}
+										{elseif $MENU eq 'Index Settings'}  
+											{assign var=MENU_URL value=$USER_MODEL->getIndexSettingsUrl()}
 										{/if}
 										<li>
 											<a data-name="{$MENU}" href="{$MENU_URL}" class="menuItemLabel {if $ACTIVE_BLOCK['menu'] eq $MENU} settingsgroup-menu-color {/if}">

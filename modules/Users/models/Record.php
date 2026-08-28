@@ -103,7 +103,7 @@ class Users_Record_Model extends Vtiger_Record_Model {
 	}
 	
     public function getIndexSettingsUrl(){
-        return 'index.php?module=' .$this->getModuleName() . '&parent=Settings&view=Indexes&record='.$this->getId();
+        return 'index.php?module=PortfolioInformation&view=Indexes';
     }
 
     public function getCalendarSettingsEditViewUrl(){

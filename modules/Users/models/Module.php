@@ -326,6 +326,7 @@ class Users_Module_Model extends Vtiger_Module_Model {
 	public function getSettingsActiveBlock($viewName) {
 		$blocksList = array('Edit'			=> array('block' => 'LBL_USER_MANAGEMENT', 'menu' => 'LBL_USERS'),
 							'Calendar'		=> array('block' => 'LBL_MY_PREFERENCES', 'menu' => 'Calendar Settings'),
+							'Indexes'		=> array('block' => 'LBL_MY_PREFERENCES', 'menu' => 'Index Settings'),
 							'PreferenceEdit'=> array('block' => 'LBL_MY_PREFERENCES', 'menu' => 'My Preferences'));
 		return $blocksList[$viewName];
 	}

@@ -185,12 +185,30 @@ class Transactions_Module_Model extends Vtiger_Module_Model {
 	function getWidgetLinkURL($trade_dates, $transaction_activity){
 		
 		$listSearchParams = array();
-		
-		//Jim modified 'Flow' to 'Trade' - Mar. 7, 2023
-		//$listSearchParams[0][0] = array('transaction_type', 'e', 'Flow');
-		$listSearchParams[0][0] = array('transaction_type', 'e', 'Trade');
-		$listSearchParams[0][1] = array('transaction_activity', 'e', $transaction_activity);
-		$listSearchParams[0][2] = array('trade_date', 'bw', $trade_dates);
+		if(!is_array($transaction_activity)){
+			$transaction_activity = array($transaction_activity);
+		}
+
+		$isTrade = false;
+		$isFlow = false;
+		foreach($transaction_activity as $act){
+			if($act == 'Buy' || $act == 'Sell'){
+				$isTrade = true;
+			} else {
+				$isFlow = true;
+			}
+		}
+
+		$condIdx = 0;
+		if($isTrade && !$isFlow){
+			$listSearchParams[0][$condIdx++] = array('transaction_type', 'e', 'Trade');
+		} else if($isFlow && !$isTrade){
+			$listSearchParams[0][$condIdx++] = array('transaction_type', 'e', 'Flow');
+		}
+
+		$activityStr = implode(',', $transaction_activity);
+		$listSearchParams[0][$condIdx++] = array('transaction_activity', 'e', $activityStr);
+		$listSearchParams[0][$condIdx++] = array('trade_date', 'bw', $trade_dates);
 			
 		$baseModuleListLink = $this->getListViewUrlWithAllFilter();
 		$baseModuleListLink = str_replace("&view=List", "&view=GraphFilterList", $baseModuleListLink);
