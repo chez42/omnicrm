@@ -41,8 +41,12 @@ class cEodGuzzle{
 
         $headers = ['test' => 'testing'];
 
-        $res = $this->guz->get(URI_PRICING . "/{$symbol}.{$exchange}", ['query' => $options]);
-        return $res->getBody()->getContents();
+        try {
+            $res = $this->guz->get(URI_PRICING . "/{$symbol}.{$exchange}", ['query' => $options]);
+            return $res->getBody()->getContents();
+        } catch(Exception $e) {
+            return null;
+        }
 #        $request = new Request("GET", $this->uri_symbol . "/{$symbol}.{$exchange}");
 
 //        $res = $this->guz->Request("GET", $this->uri_symbol . "/{$symbol}.{$exchange}");//?api_token={$this->api_token}")->getBody()->getContents();

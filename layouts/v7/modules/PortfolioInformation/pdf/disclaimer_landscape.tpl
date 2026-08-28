@@ -1,55 +1,56 @@
-<div id="disclaimer" style="font-size:8pt; font-family:Calibri, Sans-Serif;">
-    <p style="border-top:none; padding-top:15px; margin-bottom:20px;"><strong>DISCLAIMER:</strong> No representation is made as to this review's accuracy or completeness. Market values are obtained from sources believed to be reliable, but have not been audited and cannot be guaranteed. The performance data quoted represents past performance and does not guarantee future results.<br />The investment return and principal value of an investment will fluctuate thus an investor's shares, when redeemed, may be worth more or less than return data quoted herein. These reports are not intended to replace the client account statements provided by the custodian.<br />
-    This report may include accounts which were closed during the period of the report. Highlighted accounts are included for informational purposes and are not considered for the purpose of calculating performance for this report.<br />
-    This report may include forecasts, projections and other predictive statements that represent assumptions and expectations in light of currently available information. These forecasts involve risks, variables and uncertainties. The actual performance results may differ from those projected in this report. Consequently, no guarantee is presented or implied as to the accuracy of specific forecasts, projections or predictive statements contained herein.
+<div id="disclaimer" style="font-size:8pt; font-family:Calibri, Arial, Sans-Serif; line-height:1.35; color:#333333;">
+    <p style="border-top:none; padding-top:15px; margin-bottom:12px;">
+        <strong>IMPORTANT DISCLOSURES &amp; CUSTODIAL STATEMENT RECONCILIATION:</strong><br />
+        This report is prepared for informational and portfolio review purposes only and is not intended to replace the official account statements and trade confirmations provided by your qualified custodian(s) (e.g., Axos, Charles Schwab, or Fidelity). Market values, transaction history, and pricing data are obtained from sources believed to be reliable but have not been independently audited. Clients are strongly encouraged to compare the values, cash flows, and holdings presented in this report with the official monthly account statements received directly from their custodian.
     </p>
 
-    <p>
-        <strong>Beginning/Ending Values</strong><br />
-        The total value of all investments in your portfolio at the beginning and ending of the time period. The value includes cash and money market fund amounts and accrued income. If your custodian(s) does not include accrued income on statements, then the values on this report might not match the account values on your monthly custodial statement(s).
+    <p style="margin-bottom:12px;">
+        <strong>PAST PERFORMANCE &amp; INVESTMENT RISK:</strong><br />
+        Past performance is no guarantee of future results. All investments involve risk, including the possible loss of principal. The investment return and principal value of an investment will fluctuate; when liquidated or redeemed, your shares or holdings may be worth more or less than their original cost.
     </p>
 
-    <p>
-        <strong>Flow/Net Contributions</strong><br />
-        The net amount of all capital flows to and from your portfolio during the time period. Capital flows include deposits and withdrawals of cash and receipts and transfers of securities.
+    <p style="margin-bottom:12px;">
+        <strong>CALCULATION METHODOLOGY &amp; FEE DISCLOSURE:</strong><br />
+        Performance is calculated using a Daily Time-Weighted Return (TWR) methodology. Daily interval valuations accurately reflect the timing of all deposits, withdrawals, and capital flows. Unless explicitly indicated otherwise, performance figures are presented <strong>net of advisory and management fees</strong>, trading commissions, and applicable custodial expenses deducted from the account during the reporting period.
     </p>
 
-    <p>
-        <strong>Income</strong><br />
-        The total of all interest and dividend income earned in your portfolio during the time period.
+    <p style="margin-bottom:12px;">
+        <strong>BENCHMARK &amp; MARKET INDEX COMPARISONS:</strong><br />
+        Market indices (including the S&amp;P 500 Index, Bloomberg/Barclays US Aggregate Bond Index, and MSCI Emerging Markets Index) are shown for comparative and context purposes only. Broad-market indices are unmanaged, reflect the reinvestment of dividends and capital gains, and do not incur advisory fees, transaction costs, or taxes. Direct investment in an unmanaged market index is not possible. Blended benchmark returns represent a proportional combination of the underlying indices based on the target or household asset allocation.
     </p>
 
-    <p>
-        <strong>Other</strong><br />
-        The total of distributed capital gains, principal, or initial investment.
+    <p style="margin-bottom:12px;">
+        <strong>ACCOUNT INCLUSIONS &amp; TAX DISCLAIMER:</strong><br />
+        This report may include accounts that were opened or closed during the reporting period. Highlighted or informational-only accounts are excluded from performance calculations where designated. This report does not constitute tax, legal, or accounting advice. Please consult your CPA or tax advisor for tax preparation and reporting matters.
     </p>
 
-    <p>
-        <strong>Management Fees</strong><br />
-        The total of all management fees paid to your advisor during the time period.
+    <hr style="border:0; border-top:1px solid #dddddd; margin:14px 0;" />
+
+    <p style="margin-bottom:8px;">
+        <strong>GLOSSARY OF TERMS:</strong>
     </p>
 
-    <p>
-        <strong>Other Expenses</strong><br />
-        The total of all non- management fee expenses incurred by your portfolio during the time period. These expenses could include (but are not limited to) foreign taxes paid, trustee fees, federal withholding expenses, and margin expenses. Brokerage fees and other fees on individual transactions are not included.
+    <p style="margin-bottom:6px;">
+        <strong>Beginning / Ending Values:</strong> Total market value of all portfolio investments at the beginning and ending of the specified period, including cash, money market instruments, and accrued interest/dividends.
     </p>
 
-    <p>
-        <strong>Investment Return</strong><br />
-        Appreciation or depreciation of your holdings due to price changes plus any distribution and income earned during the statement period.
+    <p style="margin-bottom:6px;">
+        <strong>Net Flows / Contributions:</strong> The net sum of all capital flows (cash deposits, withdrawals, and security transfers) into or out of your accounts during the period.
     </p>
 
-    <p>
-        <strong>TWR/Time Weighted (net)</strong><br />
-        The percentage rate of return earned by your portfolio during the time period. The return reflects the aggregate performance of your portfolio’s underlying investments due to income received and price changes during the time period. The return is unaffected by decisions to deposit or withdraw cash and securities and is useful to compare against the return of market indexes during the same time period.
+    <p style="margin-bottom:6px;">
+        <strong>Income &amp; Dividends:</strong> Total dividends, interest, and coupon payments credited to your portfolio holdings during the reporting period.
     </p>
 
-    <p>
-        TWR calculation based on account transactions between the specified dates using <strong>daily</strong> begin and end value intervals.<br />
-        Daily interval calculations provide the best accuracy to the TWR performance over monthly due to price fluxuations against the date of flows.<br />
-        A deposit at the beginning of the month would have the same effect as a deposit at the end of the month using monthly, but would imediately take effect in daily.<br />
-        TWR formula is as follows:<br />
-        Holding Period = ((Interval End Value - (Flows) - IntervalBeginValue) / IntervalBeginValue + NetFlowAmount) + 1
-        TWR = ((Holding Period_1 x Holding Period_2 x ... x Holding Period_n) - 1) * 100
+    <p style="margin-bottom:6px;">
+        <strong>Management Fees &amp; Expenses:</strong> The total investment advisory fees and non-advisory expenses (such as foreign taxes, trustee fees, or margin interest) deducted from the account during the period.
+    </p>
+
+    <p style="margin-bottom:6px;">
+        <strong>Investment Return / Capital Appreciation:</strong> The change in portfolio market value resulting from price fluctuations and market movements, plus all income and distributions earned during the statement period.
+    </p>
+
+    <p style="margin-bottom:6px;">
+        <strong>Time-Weighted Return (TWR):</strong> A compound rate of growth that measures the investment manager's performance by eliminating the distorting effects of cash deposits and withdrawals over time.
     </p>
 </div>
