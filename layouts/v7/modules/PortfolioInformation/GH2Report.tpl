@@ -172,7 +172,7 @@
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("AGG")|number_format:2:".":","}%</td>
                 </tr>
                 <tr>
-                    <td colspan="7">MSCI Emerging Market (EMM)</td>
+                    <td colspan="7">MSCI Emerging Market (EEM)</td>
                     <td style="text-align:right; font-weight:bold;">{$YTDPERFORMANCE->GetIndex("EEM")|number_format:2:".":","}%</td>
                 </tr>
 {*                <tr>

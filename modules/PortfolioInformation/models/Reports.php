@@ -443,9 +443,15 @@ class PortfolioInformation_Reports_Model extends Vtiger_Module {
         $query = "SELECT * FROM PositionValuesPie";
         $result = $adb->pquery($query, array());
         $pie = array();
+        $defaultPalette = array("#292447", "#f27b0c", "#9bb556", "#eab378", "#407fe5", "#478899", "#5cafc4", "#ff1a1a", "#2b4224");
+        $i = 0;
         if($adb->num_rows($result) > 0){
             while($v = $adb->fetchByAssoc($result)){
+                if(empty($v['color']) || $v['color'] == 'null'){
+                    $v['color'] = $defaultPalette[$i % count($defaultPalette)];
+                }
                 $pie[] = $v;
+                $i++;
             }
             return $pie;
         }
@@ -457,9 +463,15 @@ class PortfolioInformation_Reports_Model extends Vtiger_Module {
         $query = "SELECT * FROM PositionValuesSector";
         $result = $adb->pquery($query, array());
         $pie = array();
+        $defaultPalette = array("#292447", "#f27b0c", "#9bb556", "#eab378", "#407fe5", "#478899", "#5cafc4", "#ff1a1a", "#2b4224");
+        $i = 0;
         if($adb->num_rows($result) > 0){
             while($v = $adb->fetchByAssoc($result)){
+                if(empty($v['color']) || $v['color'] == 'null'){
+                    $v['color'] = $defaultPalette[$i % count($defaultPalette)];
+                }
                 $pie[] = $v;
+                $i++;
             }
             return $pie;
         }

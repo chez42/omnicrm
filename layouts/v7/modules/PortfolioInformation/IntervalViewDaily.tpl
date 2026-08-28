@@ -30,7 +30,7 @@
             To: <input type="text" id="tofield" class="amcharts-input" />
         </div>
         <div class="control_buttons">
-            <button id="lyr" class="amcharts-input">{date('Y')}</button>
+            <button id="lyr" class="amcharts-input">{date('Y') - 1}</button>
             <button id="b1m" class="amcharts-input">1m</button>
             <button id="b3m" class="amcharts-input">3m</button>
             <button id="b6m" class="amcharts-input">6m</button>
@@ -103,6 +103,9 @@
                                 <h2>{$v.symbol}</h2>
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <h2>50/50 Blend</h2>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -114,9 +117,11 @@
                         {foreach item=v from=$SELECTED_INDEXES}
                             <div class="td aright">
                                 <span class="begin_value_{$v.symbol_id}"></span>
-{*                                <span class="sp_begin_value"></span>*}
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_begin_value">N/A</span>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -130,6 +135,9 @@
                                 <span class="selected_flows_{$v.symbol_id}">N/A</span>
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_selected_flows">N/A</span>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -143,6 +151,9 @@
                                 <span class="selected_income_{$v.symbol_id}">N/A</span>
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_selected_income">N/A</span>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -156,6 +167,9 @@
                                 <span class="selected_expenses_{$v.symbol_id}">N/A</span>
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_selected_expenses">N/A</span>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -167,9 +181,11 @@
                         {foreach item=v from=$SELECTED_INDEXES}
                             <div class="td aright">
                                 <span class="twr_{$v.symbol_id}"></span>
-                                {*<span class="sp_twr"></span>*}
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_twr"></span>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -181,9 +197,11 @@
                         {foreach item=v from=$SELECTED_INDEXES}
                             <div class="td aright">
                                 <span class="average_return_{$v.symbol_id}"></span>
-                                {*<span class="sp_average_return"></span>*}
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_average_return"></span>
+                        </div>
                     </div>
                     <div class="tr">
                         <div class="td">
@@ -195,9 +213,11 @@
                         {foreach item=v from=$SELECTED_INDEXES}
                             <div class="td aright">
                                 <span class="end_value_{$v.symbol_id}"></span>
-                                {*<span class="sp_end_value"></span>*}
                             </div>
                         {/foreach}
+                        <div class="td aright">
+                            <span class="blend_end_value">N/A</span>
+                        </div>
                     </div>
                 </div>
             </div>

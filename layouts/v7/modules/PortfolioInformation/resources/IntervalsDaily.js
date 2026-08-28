@@ -155,6 +155,8 @@ jQuery.Class("IntervalsDaily_Js",{
                 $(".twr_"+symbol.symbol_id).text("N/A");
                 $(".average_return_"+symbol.symbol_id).text("N/A");
             });
+            $(".blend_twr").text("N/A");
+            $(".blend_average_return").text("N/A");
             return;
         }
 //        console.log(elements);
@@ -203,11 +205,17 @@ jQuery.Class("IntervalsDaily_Js",{
                 var begin_val = parseFloat(self.symbols[0][tmp_formatted].value).toFixed(2);//parseFloat(self.symbols[0][tmp_formatted].value).toFixed(2);*/
 
         var count = 0;
+        var twr_values = [];
         $.each(self.symbolData, function(a, symbol){
             var begin_val = self.ConvertDateAndReturnValueFromSymbolObject(begin_date, "mm-dd-yy", count);
             var end_val = self.ConvertDateAndReturnValueFromSymbolObject(end_date, "mm-dd-yy", count);
-            var calculated_index = ( ((end_val/begin_val) * 100) - 100).toFixed(2);
+            var calculated_index = 0;
+            if (begin_val > 0) {
+                calculated_index = ( ((end_val/begin_val) * 100) - 100).toFixed(2);
+            }
             var average_index = (calculated_index / self.selectedCount).toFixed(2);
+
+            twr_values.push(parseFloat(calculated_index));
 
             self.DetermineColor($(".begin_value_"+symbol.symbol_id), begin_val);
             $(".begin_value_"+symbol.symbol_id).text(Number(begin_val).toLocaleString());//Set the begin value text
@@ -220,16 +228,22 @@ jQuery.Class("IntervalsDaily_Js",{
 
             count++;
         });
-/*
-        self.DetermineColor($(".sp_begin_value"), begin_val);
-        $(".sp_begin_value").text(Number(begin_val).toLocaleString());//Set the begin value text
-        self.DetermineColor($(".sp_end_value"), end_val);
-        $(".sp_end_value").text(Number(end_val).toLocaleString());//Set the begin value text
-        self.DetermineColor($(".sp_twr"), calculated_index);
-        $(".sp_twr").text(Number(calculated_index).toLocaleString() + "%");//Set the begin value text
-        self.DetermineColor($(".sp_average_return"), average_index);
-        $(".sp_average_return").text(Number(average_index).toLocaleString() + "%");//Set the begin value text
-*/
+
+        if (twr_values.length >= 2) {
+            var blend_twr = ((twr_values[0] + twr_values[1]) / 2).toFixed(2);
+            var blend_avg = (blend_twr / self.selectedCount).toFixed(2);
+            self.DetermineColor($(".blend_twr"), blend_twr);
+            $(".blend_twr").text(Number(blend_twr).toLocaleString() + "%");
+            self.DetermineColor($(".blend_average_return"), blend_avg);
+            $(".blend_average_return").text(Number(blend_avg).toLocaleString() + "%");
+        } else if (twr_values.length === 1) {
+            var blend_twr = twr_values[0].toFixed(2);
+            var blend_avg = (blend_twr / self.selectedCount).toFixed(2);
+            self.DetermineColor($(".blend_twr"), blend_twr);
+            $(".blend_twr").text(Number(blend_twr).toLocaleString() + "%");
+            self.DetermineColor($(".blend_average_return"), blend_avg);
+            $(".blend_average_return").text(Number(blend_avg).toLocaleString() + "%");
+        }
     },
 
     ConvertDateAndReturnValueFromSymbolObject: function(date, format, id){
@@ -237,8 +251,11 @@ jQuery.Class("IntervalsDaily_Js",{
 
         var tmp_date = $.datepicker.parseDate(format, date);
         var tmp_formatted = $.datepicker.formatDate( format, tmp_date);
-        var val = parseFloat(self.symbols[id][tmp_formatted].value).toFixed(2);//parseFloat(self.symbols[0][tmp_formatted].value).toFixed(2);
-        return val;
+        if (self.symbols && self.symbols[id] && self.symbols[id][tmp_formatted]) {
+            var val = parseFloat(self.symbols[id][tmp_formatted].value).toFixed(2);
+            return val;
+        }
+        return 0;
     },
 
     DetermineColor: function(element, val){
@@ -319,11 +336,27 @@ jQuery.Class("IntervalsDaily_Js",{
             });
             self.symbols = tmpSymbols;
             console.log(self.symbols);
+
+            var prev0 = null, prev1 = null;
+            var blend_val = 100.0;
             $.each(mydata, function(k, v){
                 v.amcharts_date = new Date($.datepicker.parseDate("m-d-yy", v.date));
-//                console.log(v.symbol_1);
-                if(typeof(v.symbol_1) === 'undefined'){
-                    v.symbol_1 = 0;
+                if(typeof(v.symbol_0) !== 'undefined' && typeof(v.symbol_1) !== 'undefined') {
+                    var cur0 = parseFloat(v.symbol_0);
+                    var cur1 = parseFloat(v.symbol_1);
+                    if (prev0 !== null && prev1 !== null && prev0 > 0 && prev1 > 0) {
+                        var r0 = (cur0 - prev0) / prev0;
+                        var r1 = (cur1 - prev1) / prev1;
+                        var r_blend = 0.5 * r0 + 0.5 * r1;
+                        blend_val = blend_val * (1 + r_blend);
+                    }
+                    prev0 = cur0;
+                    prev1 = cur1;
+                    v.symbol_blend = blend_val;
+                } else if (typeof(v.symbol_0) !== 'undefined') {
+                    v.symbol_blend = parseFloat(v.symbol_0);
+                }
+                if(typeof(v.calculated_twr) === 'undefined'){
                     v.calculated_twr = 0;
                 }
                 final.push(v);
@@ -394,19 +427,36 @@ jQuery.Class("IntervalsDaily_Js",{
             series1.groupFields.valueY = "open";
             series1.dataItems.template.locations.dateX = 0;
 
-            var series2 = chart.series.push(new am4charts.LineSeries());
-            series2.dataFields.dateX = "amcharts_date";
-            series2.dataFields.valueY = "symbol_0";
-            series2.dataFields.valueYShow = "changePercent";
-            series2.tooltipText = "{name}: {valueY.changePercent.formatNumber('[#0c0]+#.00|[#c00]#.##|0')}%, ({valueY.formatNumber('###,###.##')})";
-            series2.name = "S&P 500";
-            series2.tooltip.getFillFromObject = false;
-            series2.tooltip.getStrokeFromObject = true;
-            series2.tooltip.background.fill = am4core.color("#fff");
-            series2.tooltip.background.strokeWidth = 2;
-            series2.tooltip.label.fill = series2.stroke;
-            series2.groupFields.valueY = "open";
-            series2.dataItems.template.locations.dateX = 0;
+            $.each(self.symbolData, function(idx, symbol) {
+                var series = chart.series.push(new am4charts.LineSeries());
+                series.dataFields.dateX = "amcharts_date";
+                series.dataFields.valueY = "symbol_" + idx;
+                series.dataFields.valueYShow = "changePercent";
+                series.tooltipText = "{name}: {valueY.changePercent.formatNumber('[#0c0]+#.00|[#c00]#.##|0')}%, ({valueY.formatNumber('###,###.##')})";
+                series.name = symbol.description || symbol.symbol;
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.getStrokeFromObject = true;
+                series.tooltip.background.fill = am4core.color("#fff");
+                series.tooltip.background.strokeWidth = 2;
+                series.tooltip.label.fill = series.stroke;
+                series.groupFields.valueY = "open";
+                series.dataItems.template.locations.dateX = 0;
+            });
+
+            var seriesBlend = chart.series.push(new am4charts.LineSeries());
+            seriesBlend.dataFields.dateX = "amcharts_date";
+            seriesBlend.dataFields.valueY = "symbol_blend";
+            seriesBlend.dataFields.valueYShow = "changePercent";
+            seriesBlend.tooltipText = "{name}: {valueY.changePercent.formatNumber('[#0c0]+#.00|[#c00]#.##|0')}%";
+            seriesBlend.name = "50/50 Blend";
+            seriesBlend.tooltip.getFillFromObject = false;
+            seriesBlend.tooltip.getStrokeFromObject = true;
+            seriesBlend.tooltip.background.fill = am4core.color("#fff");
+            seriesBlend.tooltip.background.strokeWidth = 2;
+            seriesBlend.tooltip.label.fill = seriesBlend.stroke;
+            seriesBlend.groupFields.valueY = "open";
+            seriesBlend.dataItems.template.locations.dateX = 0;
+            seriesBlend.strokeDasharray = "4,4";
 
             chart.cursor = new am4charts.XYCursor();
             /**

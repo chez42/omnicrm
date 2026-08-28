@@ -47,9 +47,15 @@ jQuery.Class("GH2Report_Js",{
 
         if(chartData === null) { return; }
 
+        var defaultPalette = ["#292447", "#f27b0c", "#9bb556", "#eab378", "#407fe5", "#478899", "#5cafc4", "#ff1a1a", "#2b4224"];
+
         $.each(chartData,function(key, value){
             var element = jQuery(this);
-            colors.push(element["0"].color);
+            var col = element["0"].color;
+            if(!col || col === "null" || col === "#ffffff" || col === "#fff") {
+                col = defaultPalette[key % defaultPalette.length];
+            }
+            colors.push(col);
         });
 
         colorSet.list = colors.map(function(color) {
@@ -92,9 +98,15 @@ jQuery.Class("GH2Report_Js",{
 
         if(chartData === null) { return; }
 
-        $.each(chartData,function(){
+        var defaultPalette = ["#292447", "#f27b0c", "#9bb556", "#eab378", "#407fe5", "#478899", "#5cafc4", "#ff1a1a", "#2b4224"];
+
+        $.each(chartData,function(key, value){
             var element = jQuery(this);
-            colors.push(element["0"].color);
+            var col = element["0"].color;
+            if(!col || col === "null" || col === "#ffffff" || col === "#fff") {
+                col = defaultPalette[key % defaultPalette.length];
+            }
+            colors.push(col);
         });
 
         colorSet.list = colors.map(function(color) {
