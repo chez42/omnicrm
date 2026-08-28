@@ -90,8 +90,8 @@ def auto_parse(
         raise HTTPException(status_code=400, detail="The 'extension' parameter is required to identify the type of file to parse.")
 
     # Target directory paths
-    # We will search the testFiles directory first as informed by the user, then fallback to base Axos mount.
-    source_dirs = ["/mnt/lanserver2n/Axos/testFiles/", "/mnt/lanserver2n/Axos/"]
+    # Search the quarterly_history directory for historical files, then fallback to base Axos mount.
+    source_dirs = ["/mnt/lanserver2n/Axos/quarterly_history/", "/mnt/lanserver2n/Axos/"]
     target_dir = "/var/www/sites/opt/storage/custodian/axos/"
 
     # Verify storage directory exists
@@ -122,10 +122,8 @@ def auto_parse(
             # Check skipDays date constraint
             file_date = parse_date_from_filename(sanitized_name)
             if file_date and skipDays > 0:
-                # To support testing with test files from March 2025:
-                # If skipDays is less than 500, and the files are older, they will get filtered out.
-                # However, we will allow older files if they are in the testFiles folder to facilitate local integration testing.
-                if "testFiles" not in s_dir:
+                # Allow older historical files if they are in quarterly_history
+                if "quarterly_history" not in s_dir:
                     delta = datetime.date.today() - file_date
                     if delta.days > skipDays:
                         logger.info(f"Skipping {sanitized_name} because its date {file_date} is older than {skipDays} days.")

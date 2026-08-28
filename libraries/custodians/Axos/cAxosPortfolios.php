@@ -65,9 +65,7 @@ class cAxosPortfolios {
                           cf.custodian_source = ?, p.cash_value = ?, p.accountclosed = ?
                       WHERE p.portfolioinformationid = ?";
             while($v = $adb->fetchByAssoc($result)){
-                $name_parts = explode(' ', $v['name1'], 2);
-                $first_name = isset($name_parts[1]) ? $name_parts[0] : '';
-                $last_name = isset($name_parts[1]) ? $name_parts[1] : $v['name1'];
+                list($first_name, $last_name) = self::ParseFirstAndLastName($v['name1']);
 
                 $params = array(
                     $first_name,
@@ -221,5 +219,44 @@ class cAxosPortfolios {
             }
         }
         return $data;
+    }
+
+    static public function ParseFirstAndLastName($full_name){
+        $full_name = trim($full_name);
+        if(empty($full_name)){
+            return array('', '');
+        }
+
+        $parts = preg_split('/\s+/', $full_name);
+        if(count($parts) <= 1){
+            return array('', $full_name);
+        }
+
+        // List of common name suffixes
+        $suffixes = array('jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv', 'v', '(d)', 'esq', 'esq.', 'md', 'phd');
+
+        $last_parts = array();
+        $pop_suffix = true;
+        while(count($parts) > 1 && $pop_suffix){
+            $last_elem = end($parts);
+            $clean_elem = strtolower(trim($last_elem, ','));
+            if(in_array($clean_elem, $suffixes) || preg_match('/^\((d)\)$/i', $clean_elem)){
+                array_unshift($last_parts, array_pop($parts));
+            } else {
+                $pop_suffix = false;
+            }
+        }
+
+        if(count($parts) > 1){
+            array_unshift($last_parts, array_pop($parts));
+            $first_name = implode(' ', $parts);
+            $last_name = implode(' ', $last_parts);
+        } else {
+            $first_name = '';
+            array_unshift($last_parts, array_pop($parts));
+            $last_name = implode(' ', $last_parts);
+        }
+
+        return array($first_name, $last_name);
     }
 }
