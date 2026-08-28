@@ -20,10 +20,11 @@ class cPushGuzzle{
     private $operation, $parse_program;
     public function __construct($custodian, $operation){
         $this->custodian = $custodian;
+        global $dbconfig;
         $this->tenant = "Omniscient";
-        $this->user = "syncuser";
-        $this->password = "Concert222";
-        $this->connection = "192.168.102.229";
+        $this->user = $dbconfig['db_username'];
+        $this->password = $dbconfig['db_password'];
+        $this->connection = $dbconfig['db_server'];
         $this->dbname = "custodian_omniscient";
         $this->vtDBName = "live_omniscient";
 

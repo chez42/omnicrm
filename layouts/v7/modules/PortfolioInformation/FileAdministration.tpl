@@ -18,10 +18,6 @@
         <input type="button" id="RecalculateHomepageWidgets" value="Recalculate Homepage Widgets" title="Recalculate the homepage widgets to update balances and AUM" />
         <input type="text" id="consolidateDays" placeholder="<--Number of days to reconcile" /><br />
         <input type="button" id="ClearReconciledTransactions" value="Clear Reconciled Transactions" title="Clear Reconciled Transactions" />
-        <h2>Long Running Scripts</h2>
-        <input type="button" id="RecalculateAllHistoricalBalances" value="Recalculate All Historical Balances" title="Recalculate All Historical Balances for TD (All rep codes in the instance, this takes awhile!)" />
-        <input type="button" id="RecalculateXBalances" value="Recalculate TD Balances Back <X> Days" title="Recalculate Balances Back <X> Days for the instance" />
-        <input type="text" id="numDays" value="10" />
     </div>
 </div>
 {*

@@ -85,45 +85,6 @@ jQuery.Class("FileAdministration_Module_Js",{
 
         });
 
-        $("#RecalculateAllHistoricalBalances").click(function(e){
-			
-			var params = {}
-			params.module = 'PortfolioInformation';
-			params.parent = 'Settings';
-			params.action = 'CustodianInteractions';
-			params.todo = 'RecalculateAllHistoricalBalances';
-			
-			app.request.post({"data":params}).then(
-				function(err,response) {
-				
-				}
-			);
-			
-            UpdateStatus('TDBALANCEUPDATE', '.calculation-status');
-			
-        });
-
-        $("#RecalculateXBalances").click(function(e){
-            
-			var numDays = $("#numDays").val();
-            
-			var params = {}
-			params.module = 'PortfolioInformation';
-			params.parent = 'Settings';
-			params.action = 'CustodianInteractions';
-			params.todo = 'RecalculateXBalances';
-			params.days = numDays;
-			
-			
-			app.request.post({"data":params}).then(
-				function(err,response) {
-					alert(response);
-				}
-			);
-			
-
-        });
-
     },
 
     parseButton : function(value, data, cell, row, options){
@@ -216,7 +177,7 @@ jQuery.Class("FileAdministration_Module_Js",{
 					layout:"fitColumns",
 					columns:[
 						{title:"ID", field:"id", sorter:"number", formatter:self.deleteButton},
-						{title:"Custodian", field:"custodian", editor:"select", editorParams:{values:{"TD":"TD", "Fidelity":"Fidelity", "Fidelity(FTP)":"FidelityFTP", "Schwab":"Schwab", "Pershing":"Pershing", "RaymondJames":"Raymond James", "Disabled":"Disabled"}}},
+						{title:"Custodian", field:"custodian", editor:"select", editorParams:{values:{"Schwab":"Schwab", "Fidelity":"Fidelity", "Fidelity(FTP)":"FidelityFTP", "Axos":"Axos", "Pershing":"Pershing", "RaymondJames":"Raymond James", "Disabled":"Disabled"}}},
 						{title:"Rep Code", field:"rep_code", editor:true},
 						{title:"Omni Code", field:"omni_code", editor:true},
 						{title:"Active", field:"currently_active", editor:"select", formatter:"tickCross", sorter:"number", editorParams:{values:{"0":"No", "1":"Yes"}}},

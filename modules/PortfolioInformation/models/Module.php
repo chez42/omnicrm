@@ -2337,7 +2337,7 @@ SET net_amount = CASE WHEN net_amount = 0 THEN total_value ELSE net_amount END";
     static public function CreateTransactionsFromPCCloudUsingJava($custodian, $account_number){
         global $dbconfig;
         $db_name = $dbconfig['db_name'];
-        $url = "http://lanserver24.concertglobal.com:8085/OmniServ/AutoParse?tenant=Omniscient&user=syncuser&password=Concert222&connection=192.168.102.229&dbname=custodian_omniscient&operation=createtransactions&vtigerDBName={$db_name}&custodian={$custodian}&account_number={$account_number}";
+        $url = "http://lanserver24.concertglobal.com:8085/OmniServ/AutoParse?tenant=Omniscient&user={$dbconfig['db_username']}&password={$dbconfig['db_password']}&connection={$dbconfig['db_server']}&dbname=custodian_omniscient&operation=createtransactions&vtigerDBName={$db_name}&custodian={$custodian}&account_number={$account_number}";
         file_get_contents($url);
     }
 
@@ -2345,7 +2345,7 @@ SET net_amount = CASE WHEN net_amount = 0 THEN total_value ELSE net_amount END";
     {
         global $dbconfig;
         $db_name = $dbconfig['db_name'];
-        $url = "http://lanserver24.concertglobal.com:8085/OmniServ/AutoParse?tenant=Omniscient&user=syncuser&password=Concert222&connection=192.168.102.229&dbname=custodian_omniscient&operation=createtransactions&vtigerDBName={$db_name}&custodian={$custodian}&account_number={$account_number}";
+        $url = "http://lanserver24.concertglobal.com:8085/OmniServ/AutoParse?tenant=Omniscient&user={$dbconfig['db_username']}&password={$dbconfig['db_password']}&connection={$dbconfig['db_server']}&dbname=custodian_omniscient&operation=createtransactions&vtigerDBName={$db_name}&custodian={$custodian}&account_number={$account_number}";
         file_get_contents($url);
     }
 

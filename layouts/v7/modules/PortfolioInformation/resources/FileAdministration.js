@@ -50,21 +50,6 @@ jQuery.Class("FileAdministration_Module_Js",{
             });
         });
 
-        $("#RecalculateAllHistoricalBalances").click(function(e){
-            $.post("index.php", {module:'PortfolioInformation', action:'CustodianInteractions', todo:'RecalculateAllHistoricalBalances'}, function(response) {
-//                alert(response);
-            });
-            UpdateStatus('TDBALANCEUPDATE', '.calculation-status');
-        });
-
-        $("#RecalculateXBalances").click(function(e){
-            var numDays = $("#numDays").val();
-            $.post("index.php", {module:'PortfolioInformation', action:'CustodianInteractions', todo:'RecalculateXBalances', days:numDays}, function(response) {
-                alert(response);
-            });
-//            UpdateStatus('TDBALANCEUPDATE', '.calculation-status');
-        });
-
     },
 
     parseButton : function(value, data, cell, row, options){
@@ -112,7 +97,7 @@ jQuery.Class("FileAdministration_Module_Js",{
                 layout:"fitColumns",
                 columns:[
                     {title:"ID", field:"id", sorter:"number", formatter:self.deleteButton},
-                    {title:"Custodian", field:"custodian", editor:"select", editorParams:{values:{"TD":"TD", "Fidelity":"Fidelity", "Fidelity(FTP)":"FidelityFTP", "Schwab":"Schwab", "Pershing":"Pershing", "RaymondJames":"Raymond James", "Disabled":"Disabled"}}},
+                    {title:"Custodian", field:"custodian", editor:"select", editorParams:{values:{"Schwab":"Schwab", "Fidelity":"Fidelity", "Fidelity(FTP)":"FidelityFTP", "Axos":"Axos", "Pershing":"Pershing", "RaymondJames":"Raymond James", "Disabled":"Disabled"}}},
                     {title:"Rep Code", field:"rep_code", editor:true},
                     {title:"Omni Code", field:"omni_code", editor:true},
                     {title:"Active", field:"currently_active", editor:"select", formatter:"tickCross", sorter:"number", editorParams:{values:{"0":"No", "1":"Yes"}}},

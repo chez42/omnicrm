@@ -22,10 +22,11 @@ class cParseGuzzle{
         $this->custodian = $custodian;
         $this->parse_type = $parse_type;
         $this->num_days = $num_days;
+        global $dbconfig;
         $this->tenant = "Omniscient";
-        $this->user = "syncuser";
-        $this->password = "Concert222";
-        $this->connection = "192.168.102.229";
+        $this->user = $dbconfig['db_username'];
+        $this->password = $dbconfig['db_password'];
+        $this->connection = $dbconfig['db_server'];
         $this->dbname = "custodian_omniscient";
         $this->vtDBName = "live_omniscient";
         $this->dont_ignore_if_exists = $dont_ignore_if_exists;
